@@ -3,6 +3,10 @@ framework:
         # The paths to make available to the asset mapper.
         paths:
             - assets/
+            - assets/vendor/  # Pour les dépendances npm
+            - node_modules/jquery/dist/  # Pour jQuery
+            - node_modules/select2/dist/ # Pour Select2
+            # - node_modules/select2/dist/css/  # Ajoutez cette ligne
         missing_import_mode: strict
 
 when@prod:

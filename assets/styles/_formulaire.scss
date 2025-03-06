@@ -1,0 +1,5 @@
+/* Réduire la hauteur des champs */
+input[type="text"], input[type="email"], input[type="password"], select, textarea {
+    height: 35px; /* Vous pouvez ajuster la valeur en fonction de vos besoins */
+    font-size: 14px; /* Vous pouvez ajuster la taille en fonction de vos besoins */
+}
