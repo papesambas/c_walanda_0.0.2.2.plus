@@ -30,6 +30,11 @@ class Telephones2
     #[ORM\OneToOne(mappedBy: 'telephone2', cascade: ['persist', 'remove'])]
     private ?Meres $meres = null;
 
+    public function __tostring()
+    {
+        return $this->numero ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

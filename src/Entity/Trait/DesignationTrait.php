@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 trait DesignationTrait
 {
-    #[ORM\Column(length: 130, unique: true)]
+    #[ORM\Column(length: 130)]
     #[Assert\NotBlank(message: 'Cercle designation cannot be blank.')]
     #[Assert\Length(
         min: 2,

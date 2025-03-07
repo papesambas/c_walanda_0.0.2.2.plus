@@ -43,10 +43,19 @@ class Meres
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $fullname = null;
 
+    #[ORM\OneToOne(mappedBy: 'mere', cascade: ['persist', 'remove'])]
+    private ?Ninas $ninas = null;
+
     public function __construct()
     {
         $this->parents = new ArrayCollection();
     }
+
+    public function __tostring()
+    {
+        return $this->fullname ?? '';
+    }
+
 
     public function getId(): ?int
     {
@@ -151,6 +160,28 @@ class Meres
     public function setFullname(?string $fullname): static
     {
         $this->fullname = $fullname;
+
+        return $this;
+    }
+
+    public function getNinas(): ?Ninas
+    {
+        return $this->ninas;
+    }
+
+    public function setNinas(?Ninas $ninas): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($ninas === null && $this->ninas !== null) {
+            $this->ninas->setMere(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($ninas !== null && $ninas->getMere() !== $this) {
+            $ninas->setMere($this);
+        }
+
+        $this->ninas = $ninas;
 
         return $this;
     }

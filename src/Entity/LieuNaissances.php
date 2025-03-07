@@ -20,6 +20,11 @@ class LieuNaissances
     #[ORM\JoinColumn(nullable: false)]
     private ?Communes $commune = null;
 
+    public function __tostring()
+    {
+        return $this->designation ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

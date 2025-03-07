@@ -21,6 +21,11 @@ class Parents
     #[ORM\JoinColumn(nullable: false)]
     private ?Meres $mere = null;
 
+    public function __tostring()
+    {
+        return $this->pere.' '.$this->mere ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

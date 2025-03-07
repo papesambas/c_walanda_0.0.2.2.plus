@@ -33,6 +33,12 @@ class Cercles
         $this->communes = new ArrayCollection();
     }
 
+    public function __tostring()
+    {
+        return $this->designation ?? '';
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;

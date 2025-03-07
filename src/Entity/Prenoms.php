@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PrenomsRepository::class)]
+#[ORM\Table(name: 'prenoms')]
+#[ORM\UniqueConstraint(name: 'UNIQ_PRENOMS_DESIGNATION', columns: ['designation'])]
+
 class Prenoms
 {
     use DesignationTrait;
@@ -34,6 +37,11 @@ class Prenoms
     {
         $this->peres = new ArrayCollection();
         $this->meres = new ArrayCollection();
+    }
+
+    public function __tostring()
+    {
+        return $this->designation ?? '';
     }
 
     public function getId(): ?int
