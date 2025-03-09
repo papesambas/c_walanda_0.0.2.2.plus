@@ -1,35 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Meres index{% endblock %}
+{% block title %}Liste des Mères{% endblock %}
 
 {% block body %}
-    <h1>Meres index</h1>
+<div class="container-fluid mt-3">
+    <h3 class="mb-4 d-flex justify-content-center fw-bold">Liste des Mères</h3>
+    <div class="row">
+        <!-- Filtre -->
+        <div class="col-md-3">
+            <div class="card w-100 p-1">
+                <div class="card-body p-1">
+                    <h5 class="card-title">Filtrer</h5>
+                    {% include "meres/_filter.html.twig" %}
+                </div>
+            </div>
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Fullname</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for mere in meres %}
-            <tr>
-                <td>{{ mere.id }}</td>
-                <td>{{ mere.fullname }}</td>
-                <td>
-                    <a href="{{ path('app_meres_show', {'id': mere.id}) }}">show</a>
-                    <a href="{{ path('app_meres_edit', {'id': mere.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Tableau -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Nom & Prénom</th>
+                                    <th>Profession</th>
+                                    <th>téléphone</th>
+                                    <th>téléphone</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mere in meres %}
+                                <tr>
+                                    <td>{{ mere.id }}</td>
+                                    <td>{{ mere.fullname }}</td>
+                                    <td>{{ mere.profession ? mere.profession : 'Non défini' }}</td>
+                                    <td>{{ mere.telephone1 }}</td>
+                                    <td>{{ mere.telephone2 }}</td>
+                                    <td>
+                                        <a href="{{ path('app_meres_show', {'id': mere.id}) }}" class="btn btn-info btn-sm">Voir</a>
+                                        <a href="{{ path('app_meres_edit', {'id': mere.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucun enregistrement trouvé.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_meres_new') }}">Create new</a>
+    <!-- Bouton Ajouter -->
+    <div class="text-end mt-4">
+        <a href="{{ path('app_meres_new') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Ajouter une Nouvelle Mère
+        </a>
+    </div>
+</div>
+
 {% endblock %}

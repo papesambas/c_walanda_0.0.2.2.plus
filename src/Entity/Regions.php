@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\DesignationTrait;
-use App\Repository\RegionsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Repository\RegionsRepository;
+use App\Entity\Trait\DesignationTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RegionsRepository::class)]
@@ -15,6 +18,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Regions
 {
     use DesignationTrait;
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

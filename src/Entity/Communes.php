@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\DesignationTrait;
 use App\Repository\CommunesRepository;
+use App\Entity\Trait\EntityTrackingTrait;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,6 +16,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Communes
 {
     use DesignationTrait;
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

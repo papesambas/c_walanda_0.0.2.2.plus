@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\DesignationTrait;
-use App\Repository\PrenomsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Repository\PrenomsRepository;
+use App\Entity\Trait\DesignationTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PrenomsRepository::class)]
@@ -15,6 +18,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class Prenoms
 {
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
+
     use DesignationTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -33,10 +40,17 @@ class Prenoms
     #[ORM\OneToMany(targetEntity: Meres::class, mappedBy: 'prenom')]
     private Collection $meres;
 
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'prenom')]
+    private Collection $eleves;
+
     public function __construct()
     {
         $this->peres = new ArrayCollection();
         $this->meres = new ArrayCollection();
+        $this->eleves = new ArrayCollection();
     }
 
     public function __tostring()
@@ -103,6 +117,36 @@ class Prenoms
             // set the owning side to null (unless already changed)
             if ($mere->getPrenom() === $this) {
                 $mere->setPrenom(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setPrenom($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getPrenom() === $this) {
+                $elefe->setPrenom(null);
             }
         }
 

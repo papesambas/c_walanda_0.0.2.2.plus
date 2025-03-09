@@ -2,14 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\MeresRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MeresRepository;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: MeresRepository::class)]
 class Meres
 {
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -28,10 +35,11 @@ class Meres
     private ?Professions $profession = null;
 
     #[ORM\OneToOne(inversedBy: 'meres', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, unique: true)]
     private ?Telephones1 $telephone1 = null;
 
     #[ORM\OneToOne(inversedBy: 'meres', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true, unique: true)]
     private ?Telephones2 $telephone2 = null;
 
     /**

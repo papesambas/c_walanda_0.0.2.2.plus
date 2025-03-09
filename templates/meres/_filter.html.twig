@@ -1,0 +1,39 @@
+{{ form_start(form, {'attr': {'class': 'form-inline mb-4'}}) }}
+<div class="row g-3">
+    <!-- Champ de recherche (q) -->
+    <div class="col-12">
+        {{ form_row(form.q, {'attr': {'class': 'form-control', 'placeholder': 'Nom, prénom...'}}) }}
+    </div>
+
+    <!-- Liste des professions -->
+    <div class="col-12">
+        {{ form_row(form.professions, {'attr': {'class': 'form-control select-profession'}}) }}
+    </div>
+
+    <!-- Numéro de téléphone -->
+    <div class="col-12">
+        {{ form_row(form.telephone, {'attr': {'class': 'form-control', 'placeholder': 'Numéro de téléphone...'}}) }}
+    </div>
+
+    <!-- NINA -->
+    <div class="col-12">
+        {{ form_row(form.nina, {'attr': {'class': 'form-control', 'placeholder': 'Numéro d\'identification nationale...'}})
+        }}
+    </div>
+</div>
+
+<!-- Boutons -->
+
+<div class="row mt-3">
+    <div class="col-12 text-end">
+        <div class=class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search"></i> Rechercher
+            </button>
+            <a href="{{ path('app_peres_index') }}" class="btn btn-secondary w-100">
+                <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+            </a>
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}

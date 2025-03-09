@@ -2,13 +2,20 @@
 
 namespace App\Entity;
 
-use App\Repository\Telephones1Repository;
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use App\Repository\Telephones1Repository;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: Telephones1Repository::class)]
 class Telephones1
 {
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

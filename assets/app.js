@@ -3,11 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'; // Import du CSS de Bootstrap
 import 'bootstrap'; // Import du JavaScript de Bootstrap
 import '@popperjs/core'; // Import de Popper.js (requis par Bootstrap)
 
-// Initialisation de Select2
-$(document).ready(function() {
-    $('.select2').select2();
-});
-
 // Initialisation de Bootstrap (si nécessaire)
 import { Alert, Dropdown } from 'bootstrap';
 import * as bootstrap from 'bootstrap'; // Importation complète de Bootstrap
@@ -28,5 +23,7 @@ hljs.highlightAll();
 
 // Import des styles Sass (optionnel)
 import './styles/app.scss';
+import './scripts/select2.js';
+import './scripts/eleves.js'
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Data\SearchData;
 use App\Entity\Peres;
 use App\Form\PeresType;
+use App\Form\SearchDataType;
 use App\Repository\PeresRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,11 +17,27 @@ use Symfony\Component\Routing\Attribute\Route;
 final class PeresController extends AbstractController
 {
     #[Route(name: 'app_peres_index', methods: ['GET'])]
-    public function index(PeresRepository $peresRepository): Response
+    public function index(Request $request, PeresRepository $peresRepository): Response
     {
+        $data = new SearchData();
+        $form = $this->createForm(SearchDataType::class, $data);
+        $form->handleRequest($request);
+        $peres = $peresRepository->findBySearchData($data);
+        dump('data_',$data, $peres);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer les résultats filtrés en utilisant le repository
+            $peres = $peresRepository->findBySearchData($data);
+        } else {
+            // Récupérer tous les résultats si aucun critère de recherche n'est fourni
+            $peres = $peresRepository->findAll();
+        }
+
         return $this->render('peres/index.html.twig', [
-            'peres' => $peresRepository->findAll(),
+            'peres' => $peres,
+            'form' => $form->createView(),
         ]);
+
     }
 
     #[Route('/new', name: 'app_peres_new', methods: ['GET', 'POST'])]

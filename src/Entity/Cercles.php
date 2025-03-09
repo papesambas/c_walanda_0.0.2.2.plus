@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\DesignationTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use App\Entity\Trait\SlugTrait;
 use App\Repository\CerclesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,6 +16,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Cercles
 {
     use DesignationTrait;
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

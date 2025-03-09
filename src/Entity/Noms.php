@@ -2,15 +2,22 @@
 
 namespace App\Entity;
 
-use App\Repository\NomsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\NomsRepository;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NomsRepository::class)]
 class Noms
 {
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -38,10 +45,17 @@ class Noms
     #[ORM\OneToMany(targetEntity: Meres::class, mappedBy: 'nom')]
     private Collection $meres;
 
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'nom')]
+    private Collection $eleves;
+
     public function __construct()
     {
         $this->peres = new ArrayCollection();
         $this->meres = new ArrayCollection();
+        $this->eleves = new ArrayCollection();
     }
 
     public function __tostring()
@@ -129,6 +143,36 @@ class Noms
             // set the owning side to null (unless already changed)
             if ($mere->getNom() === $this) {
                 $mere->setNom(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setNom($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getNom() === $this) {
+                $elefe->setNom(null);
             }
         }
 

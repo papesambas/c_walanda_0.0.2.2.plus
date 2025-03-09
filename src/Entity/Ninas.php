@@ -2,13 +2,20 @@
 
 namespace App\Entity;
 
-use App\Repository\NinasRepository;
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\NinasRepository;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\EntityTrackingTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NinasRepository::class)]
 class Ninas
 {
+    use SlugTrait;
+    use CreatedAtTrait;
+    use EntityTrackingTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -24,9 +31,11 @@ class Ninas
     private ?string $designation = null;
 
     #[ORM\OneToOne(inversedBy: 'ninas', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true, unique: true)] // <-- Ajoutez unique: true
     private ?Peres $pere = null;
 
     #[ORM\OneToOne(inversedBy: 'ninas', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true, unique: true)] // <-- Ajoutez unique: true
     private ?Meres $mere = null;
 
     public function __toString(): string
@@ -46,7 +55,16 @@ class Ninas
 
     public function setDesignation(string $designation): static
     {
-        $this->designation = $designation;
+        // Valide que la chaîne n'est pas vide
+        if (empty(trim($designation))) {
+            throw new \InvalidArgumentException('La désignation ne peut pas être vide.');
+        }
+
+        // Supprime les espaces multiples et les espaces en début/fin de chaîne
+        $designation = trim(preg_replace('/\s+/', ' ', $designation));
+
+        // Convertit toutes les lettres en majuscules
+        $this->designation = mb_strtoupper($designation, 'UTF-8');
 
         return $this;
     }
