@@ -3,17 +3,18 @@
 namespace App\Entity;
 
 use App\Entity\Trait\SlugTrait;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Trait\CreatedAtTrait;
+use App\Repository\StatutsRepository;
 use App\Entity\Trait\DesignationTrait;
 use App\Entity\Trait\EntityTrackingTrait;
-use App\Repository\LieuNaissancesRepository;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-#[ORM\Entity(repositoryClass: LieuNaissancesRepository::class)]
-class LieuNaissances
+#[ORM\Entity(repositoryClass: StatutsRepository::class)]
+#[ORM\Table(name: 'statuts')]
+#[ORM\UniqueConstraint(name: 'UNIQ_STATUT_DESIGNATION', columns: ['designation'])]
+class Statuts
 {
     use DesignationTrait;
     use SlugTrait;
@@ -25,24 +26,22 @@ class LieuNaissances
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'lieuNaissances', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
-    private ?Communes $commune = null;
+    /**
+     * @var Collection<int, Niveaux>
+     */
+    #[ORM\ManyToMany(targetEntity: Niveaux::class, inversedBy: 'statuts')]
+    private Collection $niveaux;
 
     /**
      * @var Collection<int, Eleves>
      */
-    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'lieuNaissance')]
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'statut')]
     private Collection $eleves;
 
     public function __construct()
     {
+        $this->niveaux = new ArrayCollection();
         $this->eleves = new ArrayCollection();
-    }
-
-    public function __tostring()
-    {
-        return $this->designation ?? '';
     }
 
     public function getId(): ?int
@@ -50,14 +49,26 @@ class LieuNaissances
         return $this->id;
     }
 
-    public function getCommune(): ?Communes
+    /**
+     * @return Collection<int, Niveaux>
+     */
+    public function getNiveaux(): Collection
     {
-        return $this->commune;
+        return $this->niveaux;
     }
 
-    public function setCommune(?Communes $commune): static
+    public function addNiveau(Niveaux $niveau): static
     {
-        $this->commune = $commune;
+        if (!$this->niveaux->contains($niveau)) {
+            $this->niveaux->add($niveau);
+        }
+
+        return $this;
+    }
+
+    public function removeNiveau(Niveaux $niveau): static
+    {
+        $this->niveaux->removeElement($niveau);
 
         return $this;
     }
@@ -74,7 +85,7 @@ class LieuNaissances
     {
         if (!$this->eleves->contains($elefe)) {
             $this->eleves->add($elefe);
-            $elefe->setLieuNaissance($this);
+            $elefe->setStatut($this);
         }
 
         return $this;
@@ -84,8 +95,8 @@ class LieuNaissances
     {
         if ($this->eleves->removeElement($elefe)) {
             // set the owning side to null (unless already changed)
-            if ($elefe->getLieuNaissance() === $this) {
-                $elefe->setLieuNaissance(null);
+            if ($elefe->getStatut() === $this) {
+                $elefe->setStatut(null);
             }
         }
 

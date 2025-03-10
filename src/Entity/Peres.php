@@ -22,16 +22,16 @@ class Peres
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'peres')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'peres', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
     private ?Noms $nom = null;
 
-    #[ORM\ManyToOne(inversedBy: 'peres')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'peres', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
     private ?Prenoms $prenom = null;
 
-    #[ORM\ManyToOne(inversedBy: 'peres')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'peres', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
     private ?Professions $profession = null;
 
     #[ORM\OneToOne(inversedBy: 'peres', cascade: ['persist', 'remove'])]

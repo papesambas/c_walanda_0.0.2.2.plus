@@ -8,12 +8,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 trait DesignationTrait
 {
     #[ORM\Column(length: 130)]
-    #[Assert\NotBlank(message: 'Cercle designation cannot be blank.')]
+    #[Assert\NotBlank(message: 'designation cannot be blank.')]
     #[Assert\Length(
         min: 2,
         max: 130,
-        minMessage: 'Cercle designation must be at least {{ limit }} characters long.',
-        maxMessage: 'Cercle designation cannot be longer than {{ limit }} characters.'
+        minMessage: 'designation must be at least {{ limit }} characters long.',
+        maxMessage: 'designation cannot be longer than {{ limit }} characters.'
     )]
     private ?string $designation = null;
 

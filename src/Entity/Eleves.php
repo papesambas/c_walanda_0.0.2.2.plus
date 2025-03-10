@@ -79,6 +79,22 @@ class Eleves
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $fullname = null;
 
+    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
+    private ?Users $user = null;
+
+    #[ORM\Column(length: 1)]
+    #[Assert\Choice(choices: ['P', 'B', 'E'], message: "Le Statut Financier doit être 'P' ou 'B' ou 'E")]
+    private ?string $statutFinance = 'P';
+
+    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id')]
+    private ?Classes $classe = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
+    private ?Statuts $statut = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -271,6 +287,54 @@ class Eleves
     public function setFullname(?string $fullname): static
     {
         $this->fullname = $fullname;
+
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getStatutFinance(): ?string
+    {
+        return $this->statutFinance;
+    }
+
+    public function setStatutFinance(string $statutFinance): static
+    {
+        $this->statutFinance = $statutFinance;
+
+        return $this;
+    }
+
+    public function getClasse(): ?Classes
+    {
+        return $this->classe;
+    }
+
+    public function setClasse(?Classes $classe): static
+    {
+        $this->classe = $classe;
+
+        return $this;
+    }
+
+    public function getStatut(): ?Statuts
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(?Statuts $statut): static
+    {
+        $this->statut = $statut;
 
         return $this;
     }

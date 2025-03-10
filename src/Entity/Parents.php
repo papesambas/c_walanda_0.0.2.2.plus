@@ -22,12 +22,12 @@ class Parents
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'parents')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'parents', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
     private ?Peres $pere = null;
 
-    #[ORM\ManyToOne(inversedBy: 'parents')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'parents', fetch: 'LAZY')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
     private ?Meres $mere = null;
 
     /**
