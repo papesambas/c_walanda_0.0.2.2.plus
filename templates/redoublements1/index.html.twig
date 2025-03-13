@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Redoublements1 index{% endblock %}
+
+{% block body %}
+    <h1>Redoublements1 index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Scolarité 1</th>
+                <th>Scolarité 2</th>
+                <th>Redoublement</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for redoublements1 in redoublements1s %}
+            <tr>
+                <td>{{ redoublements1.id }}</td>
+                <td>
+                    {% for scolarite1 in redoublements1.scolarites1 %}
+                        {{ scolarite1.scolarite }}<br> {# Affiche chaque élément de la collection scolarites1 #}
+                    {% else %}
+                        Aucune scolarité 1
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for scolarite2 in redoublements1.scolarites2 %}
+                        {{ scolarite2.scolarite }}<br> {# Affiche chaque élément de la collection scolarites2 #}
+                    {% else %}
+                        Aucune scolarité 2
+                    {% endfor %}
+                </td>
+                <td>{{ redoublements1.niveau }}</td>
+                <td>
+                    <a href="{{ path('app_redoublements1_show', {'id': redoublements1.id}) }}">show</a>
+                    <a href="{{ path('app_redoublements1_edit', {'id': redoublements1.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_redoublements1_new') }}">Create new</a>
+{% endblock %}

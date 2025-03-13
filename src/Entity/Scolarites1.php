@@ -22,8 +22,8 @@ class Scolarites1
     #[ORM\Column]
     private ?int $scolarite = null;
 
-    #[ORM\ManyToOne(inversedBy: 'scolarites1s')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'scolarites1s', fetch: "LAZY")]
+    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
     private ?Niveaux $niveau = null;
 
     /**
@@ -32,11 +32,44 @@ class Scolarites1
     #[ORM\OneToMany(targetEntity: Scolarites2::class, mappedBy: 'scolarite1', orphanRemoval: true)]
     private Collection $scolarites2s;
 
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'scolarite1')]
+    private Collection $eleves;
+
+    /**
+     * @var Collection<int, Redoublements1>
+     */
+    #[ORM\ManyToMany(targetEntity: Redoublements1::class, mappedBy: 'scolarites1')]
+    private Collection $redoublements1s;
+
+    /**
+     * @var Collection<int, Redoublements2>
+     */
+    #[ORM\ManyToMany(targetEntity: Redoublements2::class, mappedBy: 'scolarites1')]
+    private Collection $redoublements2s;
+
+    /**
+     * @var Collection<int, Redoublements3>
+     */
+    #[ORM\ManyToMany(targetEntity: Redoublements3::class, mappedBy: 'scolarites1')]
+    private Collection $redoublements3s;
+
     public function __construct()
     {
         $this->scolarites2s = new ArrayCollection();
+        $this->eleves = new ArrayCollection();
+        $this->redoublements1s = new ArrayCollection();
+        $this->redoublements2s = new ArrayCollection();
+        $this->redoublements3s = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->niveau ?? '';
+    }
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -91,6 +124,117 @@ class Scolarites1
             if ($scolarites2->getScolarite1() === $this) {
                 $scolarites2->setScolarite1(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setScolarite1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getScolarite1() === $this) {
+                $elefe->setScolarite1(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements1>
+     */
+    public function getRedoublements1s(): Collection
+    {
+        return $this->redoublements1s;
+    }
+
+    public function addRedoublements1(Redoublements1 $redoublements1): static
+    {
+        if (!$this->redoublements1s->contains($redoublements1)) {
+            $this->redoublements1s->add($redoublements1);
+            $redoublements1->addScolarites1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements1(Redoublements1 $redoublements1): static
+    {
+        if ($this->redoublements1s->removeElement($redoublements1)) {
+            $redoublements1->removeScolarites1($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements2>
+     */
+    public function getRedoublements2s(): Collection
+    {
+        return $this->redoublements2s;
+    }
+
+    public function addRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if (!$this->redoublements2s->contains($redoublements2)) {
+            $this->redoublements2s->add($redoublements2);
+            $redoublements2->addScolarites1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if ($this->redoublements2s->removeElement($redoublements2)) {
+            $redoublements2->removeScolarites1($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements3>
+     */
+    public function getRedoublements3s(): Collection
+    {
+        return $this->redoublements3s;
+    }
+
+    public function addRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if (!$this->redoublements3s->contains($redoublements3)) {
+            $this->redoublements3s->add($redoublements3);
+            $redoublements3->addScolarites1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if ($this->redoublements3s->removeElement($redoublements3)) {
+            $redoublements3->removeScolarites1($this);
         }
 
         return $this;

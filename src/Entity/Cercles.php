@@ -24,8 +24,8 @@ class Cercles
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'cercles')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'cercles', fetch: "LAZY")]
+    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
     private ?Regions $region = null;
 
     /**

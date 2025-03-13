@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Trait\CreatedAtTrait;
-use App\Entity\Trait\DesignationTrait;
 use App\Entity\Trait\EntityTrackingTrait;
 use App\Entity\Trait\SlugTrait;
 use App\Repository\ClassesRepository;
@@ -23,7 +22,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class Classes
 {
     use CreatedAtTrait;
-    use DesignationTrait;
     use EntityTrackingTrait;
     use SlugTrait;
 
@@ -53,6 +51,9 @@ class Classes
      */
     #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'classe')]
     private Collection $eleves;
+
+    #[ORM\Column(length: 50)]
+    private ?string $designation = null;
 
     public function __construct()
     {
@@ -169,6 +170,18 @@ class Classes
             $this->effectif--;
             $this->updateDisponibilite();
         }
+
+        return $this;
+    }
+
+    public function getDesignation(): ?string
+    {
+        return $this->designation;
+    }
+
+    public function setDesignation(string $designation): static
+    {
+        $this->designation = $designation;
 
         return $this;
     }

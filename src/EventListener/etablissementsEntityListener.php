@@ -11,6 +11,9 @@ use App\Entity\Statuts;
 use App\Entity\Scolarites1;
 use App\Entity\Scolarites2;
 use App\Entity\Etablissements;
+use App\Entity\Redoublements1;
+use App\Entity\Redoublements2;
+use App\Entity\Redoublements3;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
@@ -164,69 +167,118 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
                 ]
             ]
         ];
-    
+
         $statuts = $this->initializeStatuts();
-    
+
         foreach ($cyclesConfig as $cycleData) {
             $cycle = new Cycles();
             $cycle->setDesignation($cycleData['nom'])
-                ->setEtablissement($etablissements);
-    
+                  ->setEtablissement($etablissements);
+        
             $this->entityManager->persist($cycle);
-    
+        
             foreach ($cycleData['niveaux'] as $niveauData) {
                 $niveau = new Niveaux();
                 $niveau->setDesignation($niveauData['nom'])
-                    ->setCycle($cycle);
-    
+                       ->setCycle($cycle);
+        
                 $this->entityManager->persist($niveau);
-    
+        
                 // Créer et associer Scolarites1
                 foreach ($niveauData['scolarites1'] as $scolarite1Value) {
                     $scolarites1 = new Scolarites1();
                     $scolarites1->setScolarite((string) $scolarite1Value)
-                        ->setNiveau($niveau);
+                                ->setNiveau($niveau);
                     $this->entityManager->persist($scolarites1);
-    
+        
+                    // Déterminer les Scolarites2 en fonction de Scolarites1 et du niveau
+                    $scolarites2Values = [];
+                    if ($cycleData['nom'] === '2nd Cycle') {
+                        $scolarites2Values = $this->getScolarites2ForSecondCycle($scolarite1Value, $niveauData['nom']);
+                    } else {
+                        $scolarites2Values = $niveauData['scolarites2']; // Utiliser les valeurs par défaut pour les autres cycles
+                    }
+        
                     // Créer et associer Scolarites2
-                    foreach ($niveauData['scolarites2'] as $scolarite2Value) {
+                    foreach ($scolarites2Values as $scolarite2Value) {
                         $scolarites2 = new Scolarites2();
                         $scolarites2->setScolarite((string) $scolarite2Value)
-                            ->setScolarite1($scolarites1)
-                            ->setNiveau($niveau);
+                                     ->setScolarite1($scolarites1)
+                                     ->setNiveau($niveau);
                         $this->entityManager->persist($scolarites2);
                     }
                 }
-    
+        
                 $this->attachStatutsToNiveau($niveau, $niveauData['nom'], $statuts);
-    
+        
                 foreach ($niveauData['classes'] as $classeNom) {
                     $classe = new Classes();
                     $classe->setDesignation($classeNom)
-                        ->setNiveau($niveau)
-                        ->setCapacite(45)
-                        ->setEffectif(0);
-    
+                           ->setNiveau($niveau)
+                           ->setCapacite(45)
+                           ->setEffectif(0);
+        
                     $this->entityManager->persist($classe);
                 }
             }
         }
     }
 
+    private function getScolarites2ForSecondCycle(int $scolarite1, string $niveauDesignation): array
+    {
+        switch ($niveauDesignation) {
+            case '7ème Année':
+                switch ($scolarite1) {
+                    case 6:
+                        return [1, 2, 3];
+                    case 7:
+                        return [1, 2, 3];
+                    case 8:
+                        return [1, 2];
+                    default:
+                        return [];
+                }
+            case '8ème Année':
+                switch ($scolarite1) {
+                    case 6:
+                        return [2, 3, 4, 5];
+                    case 7:
+                        return [2, 3, 4];
+                    case 8:
+                        return [2, 3];
+                    default:
+                        return [];
+                }
+            case '9ème Année':
+                switch ($scolarite1) {
+                    case 6:
+                        return [3, 4, 5, 6];
+                    case 7:
+                        return [3, 4, 5];
+                    case 8:
+                        return [3, 4];
+                    default:
+                        return [];
+                }
+            default:
+                return []; // Par défaut, retourne un tableau vide
+        }
+    }
+
     private function initializeStatuts(): array
     {
         $statutDefinitions = [
-            '1ère inscription' => ['niveaux_speciaux' => true],
-            'transfert arrivés' => ['niveaux_generaux' => true],
-            'transfert départ' => ['niveaux_generaux' => true],
-            'passant' => ['niveaux_generaux' => true],
-            'redoublant' => ['niveaux_generaux' => true],
-            'sans dossier' => ['niveaux_generaux' => true],
-            'passe au D.E.F' => ['niveau_specifique' => '9ème Année'],
-            'passe au C.E.P' => ['niveau_specifique' => '6ème Année'],
-            'abandon' => ['niveaux_generaux' => true],
-            'exclus' => ['niveaux_generaux' => true],
-            'candidat Libre' => ['niveaux_specifiques' => ['6ème Année', '9ème Année']]
+            '1ère Inscription' => ['niveaux_speciaux' => true],
+            'Transfert Arrivé' => ['niveaux_generaux' => true],
+            'Transfert Départ' => ['niveaux_generaux' => true],
+            'Passant' => ['niveaux_generaux' => true],
+            'Redoublant' => ['niveaux_generaux' => true],
+            'Sans Dossier' => ['niveaux_generaux' => true],
+            'Passe au D.E.F' => ['niveau_specifique' => '9ème Année'],
+            'Passe au C.E.P' => ['niveau_specifique' => '6ème Année'],
+            'Abandon' => ['niveaux_generaux' => true],
+            'Exclus' => ['niveaux_generaux' => true],
+            'Candidat Libre' => ['niveaux_specifiques' => ['6ème Année', '9ème Année']]
         ];
 
         $statuts = [];
@@ -249,12 +301,12 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
 
         // Statuts pour les niveaux spéciaux
         $specialStatuts = [
-            '1ère inscription',
-            'transfert départ',
-            'passant',
-            'redoublant',
-            'sans dossier',
-            'abandon'
+            '1ère Inscription',
+            'Transfert Départ',
+            'Passant',
+            'Redoublant',
+            'Sans Dossier',
+            'Abandon'
         ];
 
         // Si le niveau est spécial, ajouter tous les statuts spéciaux
@@ -271,13 +323,13 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
 
         // Statuts généraux pour les autres niveaux
         $generalStatuts = [
-            'transfert arrivés',
-            'transfert départ',
-            'passant',
-            'redoublant',
-            'sans dossier',
-            'abandon',
-            'exclus'
+            'Transfert Arrivé',
+            'Transfert Départ',
+            'Passant',
+            'Redoublant',
+            'Sans Dossier',
+            'Abandon',
+            'Exclus'
         ];
 
         foreach ($generalStatuts as $statutName) {
@@ -291,14 +343,15 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
         // Statuts spéciaux pour certains niveaux
         switch ($niveauDesignation) {
             case '6ème Année':
-                $niveau->addStatut($statuts['passe au C.E.P']);
-                $niveau->addStatut($statuts['candidat Libre']);
+                $niveau->addStatut($statuts['Passe au C.E.P']);
+                $niveau->addStatut($statuts['Candidat Libre']);
                 break;
 
             case '9ème Année':
-                $niveau->addStatut($statuts['passe au D.E.F']);
-                $niveau->addStatut($statuts['candidat Libre']);
+                $niveau->addStatut($statuts['Passe au D.E.F']);
+                $niveau->addStatut($statuts['Candidat Libre']);
                 break;
         }
     }
+
 }

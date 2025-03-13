@@ -16,7 +16,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 #[ORM\UniqueConstraint(name: 'UNIQ_STATUT_DESIGNATION', columns: ['designation'])]
 class Statuts
 {
-    use DesignationTrait;
     use SlugTrait;
     use CreatedAtTrait;
     use EntityTrackingTrait;
@@ -30,6 +29,7 @@ class Statuts
      * @var Collection<int, Niveaux>
      */
     #[ORM\ManyToMany(targetEntity: Niveaux::class, inversedBy: 'statuts')]
+    //#[ORM\JoinTable(name: 'statuts_niveaux')]
     private Collection $niveaux;
 
     /**
@@ -37,6 +37,9 @@ class Statuts
      */
     #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'statut')]
     private Collection $eleves;
+
+    #[ORM\Column(length: 50)]
+    private ?string $designation = null;
 
     public function __construct()
     {
@@ -99,6 +102,18 @@ class Statuts
                 $elefe->setStatut(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDesignation(): ?string
+    {
+        return $this->designation;
+    }
+
+    public function setDesignation(string $designation): static
+    {
+        $this->designation = $designation;
 
         return $this;
     }

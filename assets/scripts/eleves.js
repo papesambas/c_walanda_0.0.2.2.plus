@@ -54,4 +54,70 @@ $(document).ready(function () {
             $('#eleves_lieuNaissance').html('<option value="">Choisir un lieu de naissance</option>');
         }
     });
+
+    //Gérer le chargement de la classe
+    $('#eleves_niveau').change(function () {
+        let niveauId = $(this).val();
+        if (niveauId) {
+            $.ajax({
+                url: '/eleves/classes-by-niveau/' + niveauId,
+                type: 'GET',
+                success: function (data) {
+                    $('#eleves_classe').html(data);
+                }
+            });
+        } else {
+            $('#eleves_classe').html('<option value="">Choisir une classe</option>');
+        }
+    });
+
+        //Gérer le chargement du statut
+        $('#eleves_niveau').change(function () {
+            let niveauId = $(this).val();
+            if (niveauId) {
+                $.ajax({
+                    url: '/eleves/statuts-by-niveau/' + niveauId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#eleves_statut').html(data);
+                    }
+                });
+            } else {
+                $('#eleves_statut').html('<option value="">Choisir un statut</option>');
+            }
+        });
+    
+        //Gérer le chargement du scolarites1
+        $('#eleves_niveau').change(function () {
+            let niveauId = $(this).val();
+            if (niveauId) {
+                $.ajax({
+                    url: '/eleves/scolarites1-by-niveau/' + niveauId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#eleves_scolarite1').html(data);
+                    }
+                });
+            } else {
+                $('#eleves_scolarite1').html('<option value="">Choisir une scolarite</option>');
+            }
+        });
+
+        //Gérer le chargement du scolarites2
+        $('#eleves_scolarite1').change(function () {
+            let scolarite1Id = $(this).val();
+            if (scolarite1Id) {
+                $.ajax({
+                    url: '/eleves/scolarites2-by-scolarite1/' + scolarite1Id,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#eleves_scolarite2').html(data);
+                    }
+                });
+            } else {
+                $('#eleves_scolarite2').html('<option value="">Choisir une scolarite</option>');
+            }
+        });
+        
+
 });

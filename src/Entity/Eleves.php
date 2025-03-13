@@ -16,13 +16,13 @@ class Eleves
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'eleves')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
+    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
     #[Assert\NotNull(message: "Le nom est obligatoire")]
     private ?Noms $nom = null;
 
-    #[ORM\ManyToOne(inversedBy: 'eleves')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
+    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
     #[Assert\NotNull(message: "Le prénom est obligatoire")]
 
     private ?Prenoms $prenom = null;
@@ -32,8 +32,8 @@ class Eleves
     #[Assert\Choice(choices: ['M', 'F'], message: "Le sexe doit être 'M' ou 'F'")]
     private ?string $sexe = 'M';
 
-    #[ORM\ManyToOne(inversedBy: 'eleves')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
+    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
     private ?LieuNaissances $lieuNaissance = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
@@ -42,8 +42,8 @@ class Eleves
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $dateRecrutement = null;
 
-    #[ORM\ManyToOne(inversedBy: 'eleves')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
+    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
     private ?Parents $parent = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
@@ -62,16 +62,16 @@ class Eleves
     private ?string $numeroExtrait = null;
 
     #[ORM\Column]
-    private ?bool $isActif = null;
+    private ?bool $isActif = true;
 
     #[ORM\Column]
-    private ?bool $isAllowed = null;
+    private ?bool $isAllowed = false;
 
     #[ORM\Column]
-    private ?bool $isAdmin = null;
+    private ?bool $isAdmin = true;
 
     #[ORM\Column]
-    private ?bool $isHandicap = null;
+    private ?bool $isHandicap = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $natureHandicape = null;
@@ -94,6 +94,12 @@ class Eleves
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
     #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
     private ?Statuts $statut = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?Scolarites1 $scolarite1 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?Scolarites2 $scolarite2 = null;
 
     public function getId(): ?int
     {
@@ -335,6 +341,30 @@ class Eleves
     public function setStatut(?Statuts $statut): static
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getScolarite1(): ?Scolarites1
+    {
+        return $this->scolarite1;
+    }
+
+    public function setScolarite1(?Scolarites1 $scolarite1): static
+    {
+        $this->scolarite1 = $scolarite1;
+
+        return $this;
+    }
+
+    public function getScolarite2(): ?Scolarites2
+    {
+        return $this->scolarite2;
+    }
+
+    public function setScolarite2(?Scolarites2 $scolarite2): static
+    {
+        $this->scolarite2 = $scolarite2;
 
         return $this;
     }

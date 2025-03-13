@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Noms;
+use App\Entity\Users;
 use App\Entity\Eleves;
 use App\Entity\Cercles;
 use App\Entity\Classes;
@@ -12,19 +13,26 @@ use App\Entity\Prenoms;
 use App\Entity\Regions;
 use App\Entity\Statuts;
 use App\Entity\Communes;
+use App\Entity\Scolarites1;
+use App\Entity\Scolarites2;
 use Psr\Log\LoggerInterface;
+use App\Entity\Etablissements;
 use App\Entity\LieuNaissances;
 use Doctrine\ORM\EntityRepository;
 use App\Repository\MeresRepository;
 use App\Repository\PeresRepository;
 use App\Repository\NiveauxRepository;
 use App\Repository\StatutsRepository;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\AbstractType;
+use App\Repository\Scolarites2Repository;
+use App\Service\DateConfigurationService;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormBuilderInterface;
+use App\EventSubscriber\DateValidationSubscriber;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -46,12 +54,16 @@ class ElevesType extends AbstractType
         private MeresRepository $meresRepository,
         private StatutsRepository $statutsRepository,
         private NiveauxRepository $niveauxRepository,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private Scolarites2Repository $scolarites2Repository,
+        private DateConfigurationService $dateConfigurationService,
     ) {
         $user = $this->security->getUser();
-        if ($user && $user->getEtablissement()) {
-            $this->niveaux = $this->niveauxRepository->findByEtablissement($user->getEtablissement());
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+            $this->niveaux = $this->niveauxRepository->findByEtablissement($etablissement);
             $this->logger->info('Niveaux chargés', ['niveaux' => $this->niveaux]);
+            $this->dateConfigurationService = $dateConfigurationService;
         }
     }
 
@@ -195,9 +207,11 @@ class ElevesType extends AbstractType
                 $data = $form->getData();
                 dump($form, $data);
                 $this->addClassesField($form->getParent(), $data);
-                $this->addStatutsField($form->getParent(), $data);
+                $this->addScolarites1Field($form->getParent(), $data);
                 $this->addDatesField($form->getParent(), $data);
+                $isNewRegistration = !$form->getParent()->getData()->getId(); // Assuming getId() returns the ID of the entity
 
+                ($this->addStatutsField($form->getParent(), $form->getData(), $isNewRegistration));
             }
         );
 
@@ -225,6 +239,9 @@ class ElevesType extends AbstractType
                 }
             }
         );
+
+        // Attache l'EventSubscriber pour la validation des dates
+        $builder->addEventSubscriber(new DateValidationSubscriber());
     }
 
     public function addCerclesField(FormInterface $form, ?Regions $regions)
@@ -347,1052 +364,170 @@ class ElevesType extends AbstractType
         ]);
     }
 
-    public function addStatutsField(FormInterface $form, ?Niveaux $niveaux)
+    public function addStatutsField(FormInterface $form, ?Niveaux $niveaux, bool $isNewRegistration): void
     {
-        $form->add('statut', EntityType::class, [
-            'class' => Statuts::class,
-            'choice_label' => 'designation',
-            'choices' => $niveaux ? $niveaux->getStatuts() : [],
-            'query_builder' => function (EntityRepository $er) {
-                return $er->createQueryBuilder('s')
-                    ->orderBy('s.designation', 'ASC');
-            },
-            'placeholder' => $niveaux ? 'Entrer ou Choisir le Statut' : 'Entrer ou Choisir le niveau',
-            'attr' => [
-                'class' => 'select-statut'
-            ],
-            'required' => false,
-            'error_bubbling' => false,
-        ]);
-    }
-
-    public function addDatesField(FormInterface $form, ?Niveaux $niveaux)
-    {
-        if (!$niveaux) {
-            $form->add('dateInscription', DateType::class, [
-                'label' => 'Date d\'Inscription',
-                'widget' => 'single_text',
-                'auto_initialize' => false,
-            ])
-                ->add('dateRecrutement', DateType::class, [
-                    'label' => 'Date de Recrutement',
-                    'widget' => 'single_text',
-                    'auto_initialize' => false,
-                ])
-                ->add('dateNaissance', DateType::class, [
-                    'label' => 'Date de Naissance',
-                    'widget' => 'single_text',
-                    'auto_initialize' => false,
-                ])
-                ->add('dateExtrait', DateType::class, [
-                    'label' => 'Date Extrait',
-                    'widget' => 'single_text',
-                    'auto_initialize' => false,
-                ])
-            ;
+        $statutsForRegistration = $this->statutsRepository->findStatutsForNlEnregistrement($niveaux);
+        if ($isNewRegistration) {
+            $form->add('statut', EntityType::class, [
+                'label' => 'Statut',
+                'class' => Statuts::class,
+                'choices' => $statutsForRegistration ? $statutsForRegistration : [],
+                'placeholder' => 'Entrer ou Choisir un statut',
+                'choice_label' => 'designation',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('s')
+                        ->orderBy('s.designation', 'ASC');
+                },
+                'attr' => [
+                    'class' => 'select-statut'
+                ],
+                'error_bubbling' => false,
+            ]);
         } else {
-            $designation = $niveaux ? $niveaux->getDesignation() : null;
-            dump($designation);
-            if ($designation == "Petite Section") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -4 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -3 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -1 year'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -1 year'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -1 year'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                           new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "Moyenne Section") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -5 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -4 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -2 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -2 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -2 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "Grande Section") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -6 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -5 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -3 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -3 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -3 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "1ère Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -9 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -5 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -9 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -4 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -4 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "2ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -10 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -6 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -10 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -5 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -5 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "3ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -11 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -7 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -11 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -6 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -6 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "4ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -12 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -8 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -12 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -7 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -7 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "5ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -13 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -9 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -13 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -8 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -8 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "6ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -14 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -10 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -14 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -9 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -9 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "7ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -15 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -11 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -15 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -10 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -10 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "8ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -16 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -12 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -16 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -11 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -11 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            } elseif ($designation == "9ème Année") {
-                $form
-                    ->add('dateNaissance', DateType::class, [
-                        'label' => 'Date de Naissance',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -17 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -13 years'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateExtrait', DateType::class, [
-                        'label' => 'Date Extrait',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -17 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -1 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de l\'extrait est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $dateNaissance = $context->getRoot()->getData()->getDateNaissance();
-                                $dateExtrait = $object;
-
-                                if (is_a($dateNaissance, \DateTime::class) && is_a($dateExtrait, \DateTime::class)) {
-                                    if ($dateExtrait->format('U') - $dateNaissance->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'extrait Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                    ->add('dateInscription', DateType::class, [
-                        'label' => 'Date d\'Inscription',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                        'attr' => [
-                            'min' => (new \DateTime('now -12 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 days'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de naissance est obligatoire.',
-                            ]),
-                        ],
-                    ])
-                    ->add('dateRecrutement', DateType::class, [
-                        'label' => 'Date de Recrutement',
-                        'widget' => 'single_text',
-                        'auto_initialize' => false,
-                    'attr' => [
-                            'min' => (new \DateTime('now -12 years'))->format('Y-m-d'),
-                            'max' => (new \DateTime('now -0 day'))->format('Y-m-d'),
-                        ],
-                        'constraints' => [
-                            new NotNull([
-                                'message' => 'La date de Recrutement est obligatoire.',
-                            ]),
-                            new Callback(function ($object, ExecutionContextInterface $context) {
-                                $recrutement = $context->getRoot()->getData()->getDateRecrutement();
-                                $inscription = $object;
-
-                                if (is_a($recrutement, \DateTime::class) && is_a($inscription, \DateTime::class)) {
-                                    if ($inscription->format('U') - $recrutement->format('U') < 0) {
-                                        $context
-                                            ->buildViolation("date d'Inscription Incorrecte")
-                                            ->addViolation();
-                                    }
-                                }
-                            }),
-                        ],
-                    ])
-                ;
-            }
+            $form->add('statut', EntityType::class, [
+                'label' => 'Statut',
+                'class' => Statuts::class,
+                'choices' => $niveaux ? $niveaux->getStatuts() : [],
+                'placeholder' => 'Entrer ou Choisir un statut',
+                'choice_label' => 'designation',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('s')
+                        ->orderBy('s.designation', 'ASC');
+                },
+                'attr' => [
+                    'class' => 'select-statut'
+                ],
+                'error_bubbling' => false,
+            ]);
         }
     }
 
+    public function addScolarites1Field(FormInterface $form, ?Niveaux $niveaux)
+    {
+        $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
+            'scolarite1',
+            EntityType::class,
+            null,
+            [
+                'class' => Scolarites1::class,
+                'choice_label' => 'scolarite',
+                'label' => 'Scolarité 1er Cy :',
+                'auto_initialize' => false,
+                'choices' => $niveaux ? $niveaux->getScolarites1s() : [],
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('s')
+                        ->orderBy('s.scolarite', 'ASC');
+                },
+                'placeholder' => $niveaux ? '** ** ' : '## ##',
+                'attr' => [
+                    'class' => 'select-scolarite'
+                ],
+                /*'constraints' => [
+                new Assert\NotBlank(),
+            ],*/
+                'required' => false,
+                'mapped' => false,
+                'error_bubbling' => false,
+            ]
+        );
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $form->getData();
+                $this->addScolarites2Field($form->getParent(), $form->getData());
+            }
+        );
+
+        $form->add($builder->getForm());
+    }
+
+    public function addScolarites2Field(FormInterface $form, ?Scolarites1 $scolarites1)
+    {
+        $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
+            'scolarite2',
+            EntityType::class,
+            null,
+            [
+                'class' => Scolarites2::class,
+                'choice_label' => 'scolarite',
+                'label' => 'Scolarité 2nd Cycle :',
+                'auto_initialize' => false,
+                'choices' => $scolarites1 ? $scolarites1->getScolarites2s() : [],
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('s')
+                        ->orderBy('s.scolarite', 'ASC');
+                },
+                'placeholder' => $scolarites1 ? '** ** ' : '## ##',
+                'attr' => [
+                    'class' => 'select-scolarite'
+                ],
+                /*'constraints' => [
+                new Assert\NotBlank(),
+            ],*/
+                'required' => false,
+                'mapped' => false,
+                'error_bubbling' => false,
+            ]
+        );
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $form->getData();
+                //$this->addScolarites2Field($form->getParent(), $form->getData());
+            }
+        );
+
+        $form->add($builder->getForm());
+    }
+
+    public function addDatesField(FormInterface $form, ?Niveaux $niveaux): void
+    {
+        if (!$niveaux) {
+            // Ajoutez les champs par défaut si aucun niveau n'est sélectionné
+            $this->addDateFields($form, [
+                'dateInscription' => ['min' => '-1 year', 'max' => 'now'],
+                'dateRecrutement' => ['min' => '-1 year', 'max' => '-1 day'],
+                'dateNaissance' => ['min' => '-4 years', 'max' => '-3 years'],
+                'dateExtrait' => ['min' => '-1 year', 'max' => '-1 day'],
+            ]);
+            return;
+        }
+
+        $designation = $niveaux->getDesignation();
+        $configurations = $this->getDateConfigurations();
+
+        if (isset($configurations[$designation])) {
+            $this->addDateFields($form, $configurations[$designation]);
+            //$this->addCustomValidation($form);
+        }
+    }
+
+    private function addDateFields(FormInterface $form, array $config): void
+    {
+        foreach ($config as $field => $dates) {
+            $form->add($field, DateType::class, [
+                'label' => ucfirst(str_replace('date', 'Date ', $field)),
+                'widget' => 'single_text',
+                'auto_initialize' => false,
+                'attr' => [
+                    'min' => (new \DateTime($dates['min']))->format('Y-m-d'),
+                    'max' => (new \DateTime($dates['max']))->format('Y-m-d'),
+                ],
+                'constraints' => [
+                    new NotNull([
+                        'message' => 'Ce champ est obligatoire.',
+                    ]),
+                ],
+            ]);
+        }
+    }
+
+    private function getDateConfigurations(): array
+    {
+        return $this->dateConfigurationService->getDateConfigurations();
+    }
 
     public function configureOptions(OptionsResolver $resolver): void
     {

@@ -63,13 +63,41 @@ class Niveaux
     #[ORM\Column(length: 60)]
     private ?string $designation = null;
 
+    /**
+     * @var Collection<int, Redoublements1>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements1::class, mappedBy: 'niveaux')]
+    private Collection $redoublements1s;
+
+    /**
+     * @var Collection<int, Redoublements2>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements2::class, mappedBy: 'niveaux')]
+    private Collection $redoublements2s;
+
+    /**
+     * @var Collection<int, Redoublements3>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements3::class, mappedBy: 'niveaux')]
+    private Collection $redoublements3s;
+
+
     public function __construct()
     {
         $this->classes = new ArrayCollection();
         $this->statuts = new ArrayCollection();
         $this->scolarites1s = new ArrayCollection();
         $this->scolarites2s = new ArrayCollection();
+        $this->redoublements1s = new ArrayCollection();
+        $this->redoublements2s = new ArrayCollection();
+        $this->redoublements3s = new ArrayCollection();
     }
+
+    public function __toString(): string
+    {
+        return $this->designation ?? '';
+    }
+
 
     public function getId(): ?int
     {
@@ -240,4 +268,95 @@ class Niveaux
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Redoublements1>
+     */
+    public function getRedoublements1s(): Collection
+    {
+        return $this->redoublements1s;
+    }
+
+    public function addRedoublements1(Redoublements1 $redoublements1): static
+    {
+        if (!$this->redoublements1s->contains($redoublements1)) {
+            $this->redoublements1s->add($redoublements1);
+            $redoublements1->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements1(Redoublements1 $redoublements1): static
+    {
+        if ($this->redoublements1s->removeElement($redoublements1)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements1->getNiveau() === $this) {
+                $redoublements1->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements2>
+     */
+    public function getRedoublements2s(): Collection
+    {
+        return $this->redoublements2s;
+    }
+
+    public function addRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if (!$this->redoublements2s->contains($redoublements2)) {
+            $this->redoublements2s->add($redoublements2);
+            $redoublements2->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if ($this->redoublements2s->removeElement($redoublements2)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements2->getNiveau() === $this) {
+                $redoublements2->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements3>
+     */
+    public function getRedoublements3s(): Collection
+    {
+        return $this->redoublements3s;
+    }
+
+    public function addRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if (!$this->redoublements3s->contains($redoublements3)) {
+            $this->redoublements3s->add($redoublements3);
+            $redoublements3->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if ($this->redoublements3s->removeElement($redoublements3)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements3->getNiveau() === $this) {
+                $redoublements3->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

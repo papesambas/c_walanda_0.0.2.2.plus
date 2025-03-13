@@ -20,12 +20,11 @@ class NiveauxRepository extends ServiceEntityRepository
     public function findByEtablissement(Etablissements $etablissements): array
     {
         return $this->createQueryBuilder('n')
-            ->innerJoin('n.cycle', 'c') // Utilisez INNER JOIN si vous êtes sûr que chaque niveau a un cycle
+            ->leftJoin('n.cycle', 'c') // Utilisez INNER JOIN si vous êtes sûr que chaque niveau a un cycle
             ->addSelect('c')
             ->andWhere('c.etablissement = :val')
             ->setParameter('val', $etablissements)
             ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
