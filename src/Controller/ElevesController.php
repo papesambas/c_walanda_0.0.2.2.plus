@@ -21,10 +21,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 
 #[Route('/eleves')]
 final class ElevesController extends AbstractController
 {
+    public function __construct(private Security $security)
+    {
+        $this->security = $security;
+    }
     #[Route(name: 'app_eleves_index', methods: ['GET'])]
     public function index(ElevesRepository $elevesRepository): Response
     {
@@ -41,6 +46,12 @@ final class ElevesController extends AbstractController
     ): Response {
         $elefe = new Eleves();
 
+        /*$user = $this->security->getUser();
+        if(!$user){
+            $this->addFlash('error', 'Vous devez être connecté');
+            return $this->redirectToRoute('app_login', [], Response::HTTP_SEE_OTHER);
+        }
+
         // Vérifier si un parent est passé en paramètre
         if (!$request->query->has('parent_id')) {
             $this->addFlash('error', 'Un parent doit être associé à l\'élève. Veuillez d\'abord créer ou sélectionner un parent.');
@@ -54,7 +65,7 @@ final class ElevesController extends AbstractController
         } else {
             $this->addFlash('error', 'Le parent spécifié n\'existe pas.');
             return $this->redirectToRoute('app_parents_index', [], Response::HTTP_SEE_OTHER);
-        }
+        }*/
 
         $form = $this->createForm(ElevesType::class, $elefe);
         $form->handleRequest($request);

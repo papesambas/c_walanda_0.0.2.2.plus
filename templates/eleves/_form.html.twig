@@ -1,4 +1,106 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+{# templates/eleves/new.html.twig #}
+
+{% block body %}
+<div class="container mt-4">
+    <h3 class="mb-4">Ajouter un élève</h3>
+
+    {# Afficher le formulaire #}
+    {{ form_start(form) }}
+    {{ form_errors(form) }}
+    <div class="row">
+        <div class="col-md-6">
+            {# Section Informations personnelles #}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    Informations personnelles
+                </div>
+                <div class="card-body">
+                   {# {{ form_row(form.imageFile) }} #}
+                    {{ form_row(form.nom) }}
+                    {{ form_row(form.prenom) }}
+                    {{ form_row(form.sexe) }}
+                    <div class="row">
+                        <div class="col-6">{{ form_row(form.dateNaissance) }}</div>
+                        <div class="col-6">{{ form_row(form.dateExtrait) }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">{{ form_row(form.numeroExtrait) }}</div>
+                        {#<div class="col-4 mt-4">{{ form_label(form.isHandicap) }}</div>#}
+                        <div class="col-2 mt-5">{{ form_widget(form.isHandicap) }}</div>
+                    </div>
+                 {{ form_row(form.natureHandicape) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            {# Section Informations scolaires #}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    Informations scolaires
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">{{ form_row(form.dateInscription) }}</div>
+                        <div class="col-6">{{ form_row(form.dateRecrutement) }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">{{ form_row(form.niveau) }}</div>
+                        <div class="col-6">{{ form_row(form.classe) }}</div>
+                    </div>
+                    {{ form_row(form.statutFinance) }}
+                    <div class="row">
+                        <div class="col-6">{{ form_row(form.scolarite1) }}</div>
+                        <div class="col-6">{{ form_row(form.scolarite2) }}</div>
+                        <div class="col-6">{{ form_row(form.statut) }}</div>
+                        <div class="col-6">{{ form_row(form.redoublement1) }}</div>
+                        <div class="col-6">{{ form_row(form.redoublement2) }}</div>
+                        <div class="col-6">{{ form_row(form.redoublement3) }}</div>
+                    </div>
+
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Section Lieu de naissance #}
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            Lieu de naissance
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(form.region) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.cercle) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.commune) }}
+                </div>
+            </div>
+            {{ form_row(form.lieuNaissance) }}
+        </div>
+    </div>
+
+    {# Section Documents #}
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            Documents
+        </div>
+        <div class="card-body">
+            {#{{ form_row(form.document) }}#}
+        </div>
+    </div>
+
+    {# Bouton de soumission #}
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

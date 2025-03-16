@@ -18,6 +18,9 @@ use App\Entity\Scolarites2;
 use Psr\Log\LoggerInterface;
 use App\Entity\Etablissements;
 use App\Entity\LieuNaissances;
+use App\Entity\Redoublements1;
+use App\Entity\Redoublements2;
+use App\Entity\Redoublements3;
 use Doctrine\ORM\EntityRepository;
 use App\Repository\MeresRepository;
 use App\Repository\PeresRepository;
@@ -31,6 +34,9 @@ use App\Repository\Scolarites2Repository;
 use App\Service\DateConfigurationService;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use App\Repository\Redoublements1Repository;
+use App\Repository\Redoublements2Repository;
+use App\Repository\Redoublements3Repository;
 use Symfony\Component\Form\FormBuilderInterface;
 use App\EventSubscriber\DateValidationSubscriber;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -57,6 +63,9 @@ class ElevesType extends AbstractType
         private LoggerInterface $logger,
         private Scolarites2Repository $scolarites2Repository,
         private DateConfigurationService $dateConfigurationService,
+        private Redoublements1Repository $redoublements1Repository,
+        private Redoublements2Repository $redoublements2Repository,
+        private Redoublements3Repository $redoublements3Repository,
     ) {
         $user = $this->security->getUser();
         if ($user instanceof Users) {
@@ -205,7 +214,6 @@ class ElevesType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
                 $data = $form->getData();
-                dump($form, $data);
                 $this->addClassesField($form->getParent(), $data);
                 $this->addScolarites1Field($form->getParent(), $data);
                 $this->addDatesField($form->getParent(), $data);
@@ -236,6 +244,56 @@ class ElevesType extends AbstractType
                     $this->addCerclesField($form, null);
                     $this->addCommunesField($form, null);
                     $this->addLieuNaissanceField($form, null);
+                }
+            }
+        );
+
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                /**@Redoublements3 $redoublement3 */
+                $redoublement3 = $data->getScolarite2();
+                $form = $event->getForm();
+                if ($redoublement3) {
+                    $redoublement2 = $redoublement3->getRedoublement2();
+                    $redoublement1 = $redoublement2->getRedoublement1();
+                    $scolarite2 = $redoublement1->getScolarites2();
+                    $scolarite1 = $scolarite2->getScolarite1();
+                    $niveau = $scolarite1->getNiveau();
+                    $this->addClassesField($form, $niveau);
+                    $this->addScolarites1Field($form, $niveau);
+                    $this->addDatesField($form, $niveau);
+                    $isNewRegistration = $form ? !$form : true;
+                    $this->addStatutsField($form, $niveau, $isNewRegistration);
+                    $this->addScolarites2Field($form, $scolarite1);
+                    if ($scolarite1 !== null && $scolarite2 !== null) {
+                        $this->addRedoublements1Field($form, $scolarite1, $scolarite2);
+                    } else {
+                        $this->addRedoublements1Field($form, null, null);
+                    }
+                    if ($scolarite1 !== null && $scolarite2 !== null && $redoublement1 !== null) {
+                        $this->addRedoublements2Field($form, $redoublement1, $scolarite1, $scolarite2);
+                    } else {
+                        $this->addRedoublements2Field($form, null, null, null);
+                    }
+                    if ($scolarite1 !== null && $scolarite2 !== null  && $redoublement2 !== null) {
+                        $this->addRedoublements3Field($form, $redoublement2, $scolarite1, $scolarite2);
+                    } else {
+                        $this->addRedoublements3Field($form, null, null, null);
+                    }
+                    $form->get('niveau')->setData($niveau);
+                    $form->get('scolarite1')->setData($scolarite1);
+                } else {
+                    $this->addClassesField($form, null);
+                    $this->addScolarites1Field($form, null);
+                    $this->addDatesField($form, null);
+                    $isNewRegistration = $form ? !$form : true;
+                    $this->addStatutsField($form, null, $isNewRegistration);
+                    $this->addScolarites2Field($form, null);
+                    $this->addRedoublements1Field($form, null, null);
+                    $this->addRedoublements2Field($form, null, null, null);
+                    $this->addRedoublements3Field($form, null, null, null);
                 }
             }
         );
@@ -411,7 +469,7 @@ class ElevesType extends AbstractType
             [
                 'class' => Scolarites1::class,
                 'choice_label' => 'scolarite',
-                'label' => 'Scolarité 1er Cy :',
+                'label' => 'Scolarité 1er Cycle :',
                 'auto_initialize' => false,
                 'choices' => $niveaux ? $niveaux->getScolarites1s() : [],
                 'query_builder' => function (EntityRepository $er) {
@@ -475,12 +533,122 @@ class ElevesType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
                 $data = $form->getData();
-                //$this->addScolarites2Field($form->getParent(), $form->getData());
+                dump($data);
+                $this->addRedoublements1Field($form->getParent(), $form->getData()->getScolarite1(), $form->getData());
             }
         );
 
         $form->add($builder->getForm());
     }
+
+    public function addRedoublements1Field(FormInterface $form, ?Scolarites1 $scolarites1, ?Scolarites2 $scolarites2): void
+    {
+        // Récupérez les Redoublements1 depuis le repository
+        $redoublements1 = $this->redoublements1Repository->findByScolarites1AndScolarites2($scolarites1, $scolarites2);
+
+        $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
+            'redoublement1',
+            EntityType::class,
+            null,
+            [
+                'class' => Redoublements1::class,
+                'choice_label' => 'niveau', // Assurez-vous que 'niveau' est une propriété valide de Redoublements1
+                'label' => '1er Redoub :',
+                'auto_initialize' => false,
+                'choices' => $redoublements1, // Utilisez les résultats du repository
+                'placeholder' => $redoublements1 ? '** ** ' : '## ##',
+                'attr' => [
+                    'class' => 'select-redoublement'
+                ],
+                'required' => false,
+                'mapped' => false,
+                'error_bubbling' => false,
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $form->getData();
+                dump($data);
+                foreach ($form->getData()->getScolarites1() as $scolarite1) {
+                    if ($scolarite1) {
+                        foreach ($form->getData()->getScolarites2() as $scolarite2) {
+                            if ($scolarite2) {
+                                $this->addRedoublements2Field($form->getParent(), $form->getData(), $scolarite1, $scolarite2);
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        $form->add($builder->getForm());
+    }
+
+    public function addRedoublements2Field(FormInterface $form, ?Redoublements1 $redoublements1, ?Scolarites1 $scolarites1, ?Scolarites2 $scolarites2): void
+    {
+        // Récupérez les Redoublements1 depuis le repository
+        $redoublements2 = $this->redoublements2Repository->findByRedoublement1AndScolarites1AndScolarites2($redoublements1, $scolarites1, $scolarites2);
+        dump($redoublements2);
+        $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
+            'redoublement2',
+            EntityType::class,
+            null,
+            [
+                'class' => Redoublements2::class,
+                'choice_label' => 'niveau', // Assurez-vous que 'niveau' est une propriété valide de Redoublements1
+                'label' => '2nd Redoub :',
+                'auto_initialize' => false,
+                'choices' => $redoublements2, // Utilisez les résultats du repository
+                'placeholder' => $redoublements2 ? '** ** ' : '## ##',
+                'attr' => [
+                    'class' => 'select-redoublement'
+                ],
+                'required' => false,
+                'mapped' => false,
+                'error_bubbling' => false,
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $form->getData();
+                // Vous pouvez ajouter d'autres logiques ici si nécessaire
+            }
+        );
+
+        $form->add($builder->getForm());
+    }
+
+    public function addRedoublements3Field(FormInterface $form, ?Redoublements2 $redoublements2, ?Scolarites1 $scolarites1, ?Scolarites2 $scolarites2): void
+    {
+        // Récupérez les Redoublements1 depuis le repository
+        $redoublements3 = $this->redoublements3Repository->findByRedoublement2AndScolarites1AndScolarites2($redoublements2, $scolarites1, $scolarites2);
+        dump($redoublements3);
+        $form->add(
+            'redoublement3',
+            EntityType::class,
+            [
+                'class' => Redoublements3::class,
+                'choice_label' => 'niveau', // Assurez-vous que 'niveau' est une propriété valide de Redoublements1
+                'label' => '3ème Redoub :',
+                'auto_initialize' => false,
+                'choices' => $redoublements3, // Utilisez les résultats du repository
+                'placeholder' => $redoublements3 ? '** ** ' : '## ##',
+                'attr' => [
+                    'class' => 'select-redoublement'
+                ],
+                'required' => false,
+                'mapped' => false,
+                'error_bubbling' => false,
+            ]
+        );
+    }
+
 
     public function addDatesField(FormInterface $form, ?Niveaux $niveaux): void
     {

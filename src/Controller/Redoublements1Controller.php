@@ -18,7 +18,7 @@ final class Redoublements1Controller extends AbstractController
     public function index(Redoublements1Repository $redoublements1Repository): Response
     {
         // Utilisation de findBy() avec un orderBy
-        $redoublements1s = $redoublements1Repository->findBy([], ['niveau' => 'ASC']);
+        $redoublements1s = $redoublements1Repository->findBy([], ['id' => 'ASC', 'niveau' => 'ASC']);
 
         return $this->render('redoublements1/index.html.twig', [
             'redoublements1s' => $redoublements1s,

@@ -12,18 +12,18 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class communesEntityListener
 {
-    private $Securty;
+    private $Security;
     private $Slugger;
 
     public function __construct(Security $security, SluggerInterface $Slugger)
     {
-        $this->Securty = $security;
+        $this->Security = $security;
         $this->Slugger = $Slugger;
     }
 
     public function prePersist(Communes $commune, LifecycleEventArgs $arg): void
     {
-        $user = $this->Securty->getUser();
+        $user = $this->Security->getUser();
         if ($user === null) {
             $commune
             ->setCreatedAt(new \DateTimeImmutable('now'))
@@ -38,7 +38,7 @@ class communesEntityListener
 
     public function preUpdate(Communes $commune, LifecycleEventArgs $arg): void
     {
-        $user = $this->Securty->getUser();
+        $user = $this->Security->getUser();
         if ($user === null) {
             $commune
             ->setUpdatedAt(new \DateTimeImmutable('now'))
