@@ -19,21 +19,15 @@ class Redoublements3Repository extends ServiceEntityRepository
         parent::__construct($registry, Redoublements3::class);
     }
 
-    public function findByRedoublement2AndScolarites1AndScolarites2(?Redoublements2 $redoublements2, ?Scolarites1 $scolarites1, ?Scolarites2 $scolarites2): array
+    public function findByRedoublement2(?Redoublements2 $redoublements2): array
     {
-        if ($redoublements2 === null || $scolarites1 === null || $scolarites2 === null) {
+        if ($redoublements2 === null) {
             return [];
         }
     
         // Création du QueryBuilder
         return $this->createQueryBuilder('r')
-            ->leftJoin('r.scolarites1', 's1') // Jointure gauche avec Scolarites1
-            ->leftJoin('r.scolarites2', 's2') // Jointure gauche avec Scolarites2
-            ->andWhere('s1 = :scolarite1')    
-            ->andWhere('s2 = :scolarite2')    
-            ->andWhere('r.redoublements2 = :redoublement2') // Correction du paramètre
-            ->setParameter('scolarite1', $scolarites1)
-            ->setParameter('scolarite2', $scolarites2)
+            ->andWhere('r.redoublement2 = :redoublement2') // Correction du paramètre
             ->setParameter('redoublement2', $redoublements2)
             ->orderBy('r.id', 'ASC')
             ->getQuery()

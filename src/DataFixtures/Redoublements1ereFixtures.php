@@ -43,8 +43,8 @@ class Redoublements1ereFixtures extends Fixture implements DependentFixtureInter
                     if ($niveauDesignation === '1ère Année' && $scolaritee1 == 2 && $scolaritee2 == 0) {
                         $redoublement1 = new Redoublements1();
                         $redoublement1->setNiveau($niveau1ere);
-                        $redoublement1->addScolarites1($scolarite1);
-                        $redoublement1->addScolarites2($scolarite2);
+                        $redoublement1->setScolarite1($scolarite1);
+                        $redoublement1->setScolarite2($scolarite2);
 
                         $manager->persist($redoublement1);
 
@@ -53,15 +53,15 @@ class Redoublements1ereFixtures extends Fixture implements DependentFixtureInter
                         //1er redoublement en 1ère année
                         $redoublement1 = new Redoublements1();
                         $redoublement1->setNiveau($niveau1ere);
-                        $redoublement1->addScolarites1($scolarite1);
-                        $redoublement1->addScolarites2($scolarite2);
+                        $redoublement1->setScolarite1($scolarite1);
+                        $redoublement1->setScolarite2($scolarite2);
                         for ($i = 0; $i < 1; $i++) {
                             //2ème redoublement en 1ère année
                             $redoublement2 = new Redoublements2();
                             $redoublement2->setNiveau($niveau1ere);
                             $redoublement2->setRedoublement1($redoublement1);
-                            $redoublement2->addScolarites1($scolarite1);
-                            $redoublement2->addScolarites2($scolarite2);
+                            $redoublement2->setScolarite1($scolarite1);
+                            $redoublement2->setScolarite2($scolarite2);
                             $manager->persist($redoublement2);
                         }
                         $manager->persist($redoublement1);
@@ -78,16 +78,16 @@ class Redoublements1ereFixtures extends Fixture implements DependentFixtureInter
     private function configRedoublement1(ObjectManager $manager, $niveau, $redoublement1, $scolarite1, $scolarite2)
     {
         $redoublement1->setNiveau($niveau);
-        $redoublement1->addScolarites1($scolarite1);
-        $redoublement1->addScolarites2($scolarite2);
+        $redoublement1->setScolarite1($scolarite1);
+        $redoublement1->setScolarite2($scolarite2);
         $manager->persist($redoublement1);
     }
     private function configRedoublement2(ObjectManager $manager, $niveau, $redoublement2, $redoublement1, $scolarite1, $scolarite2)
     {
         $redoublement2->setNiveau($niveau);
         $redoublement2->setRedoublement1($redoublement1);
-        $redoublement2->addScolarites1($scolarite1);
-        $redoublement2->addScolarites2($scolarite2);
+        $redoublement2->setScolarite1($scolarite1);
+        $redoublement2->setScolarite2($scolarite2);
         $manager->persist($redoublement2);
     }
 

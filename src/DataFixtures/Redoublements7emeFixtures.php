@@ -47,24 +47,26 @@ class Redoublements7emeFixtures extends Fixture implements DependentFixtureInter
                             // 1er redoublement 7ème année
                             $redoublement1 = new Redoublements1();
                             $redoublement1->setNiveau($niveau7eme);
-                            $redoublement1->addScolarites1($scolarite1);
-                            $redoublement1->addScolarites2($scolarite2);
+                            $redoublement1->setScolarite1($scolarite1);
+                            $redoublement1->setScolarite2($scolarite2);
                             $manager->persist($redoublement1);
                         } elseif ($scolaritee1 == 6 && $scolaritee2 == 3) {
                             // 1er redoublement 7ème année
                             $redoublement1 = new Redoublements1();
                             $redoublement1->setNiveau($niveau7eme);
-                            $redoublement1->addScolarites1($scolarite1);
-                            $redoublement1->addScolarites2($scolarite2);
+                            $redoublement1->setScolarite1($scolarite1);
+                            $redoublement1->setScolarite2($scolarite2);
                             $manager->persist($redoublement1);
+                            for ($a = 0; $a < 1; $a++) {
+                                // 2ème redoublement 7ème année
+                                $redoublement2 = new Redoublements2();
+                                $redoublement2->setNiveau($niveau7eme);
+                                $redoublement2->setRedoublement1($redoublement1);
+                                $redoublement2->setScolarite1($scolarite1);
+                                $redoublement2->setScolarite2($scolarite2);
+                                $manager->persist($redoublement2);
+                            }
 
-                            // 2ème redoublement 7ème année
-                            $redoublement2 = new Redoublements2();
-                            $redoublement2->setNiveau($niveau7eme);
-                            $redoublement2->setRedoublement1($redoublement1);
-                            $redoublement2->addScolarites1($scolarite1);
-                            $redoublement2->addScolarites2($scolarite2);
-                            $manager->persist($redoublement2);
                         } elseif ($scolaritee1 == 7 && $scolaritee2 == 2) {
                             $this->createRedoublementsForLevels($manager, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme, $niveau7eme, $scolarite1, $scolarite2, false);
                         } elseif ($scolaritee1 == 7 && $scolaritee2 == 3) {
@@ -96,30 +98,30 @@ class Redoublements7emeFixtures extends Fixture implements DependentFixtureInter
         for ($i = 0; $i < 6; $i++) {
             $redoublement1 = new Redoublements1();
             $redoublement1->setNiveau($this->getNiveauByIndex($i, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-            $redoublement1->addScolarites1($scolarite1);
-            $redoublement1->addScolarites2($scolarite2);
+            $redoublement1->setScolarite1($scolarite1);
+            $redoublement1->setScolarite2($scolarite2);
             $manager->persist($redoublement1);
 
             if ($withRedoublement3) {
                 $redoublement2 = new Redoublements2();
                 $redoublement2->setNiveau($niveau7eme);
                 $redoublement2->setRedoublement1($redoublement1);
-                $redoublement2->addScolarites1($scolarite1);
-                $redoublement2->addScolarites2($scolarite2);
+                $redoublement2->setScolarite1($scolarite1);
+                $redoublement2->setScolarite2($scolarite2);
                 $manager->persist($redoublement2);
 
                 $redoublement3 = new Redoublements3();
                 $redoublement3->setNiveau($niveau7eme);
                 $redoublement3->setRedoublement2($redoublement2);
-                $redoublement3->addScolarites1($scolarite1);
-                $redoublement3->addScolarites2($scolarite2);
+                $redoublement3->setScolarite1($scolarite1);
+                $redoublement3->setScolarite2($scolarite2);
                 $manager->persist($redoublement3);
             } else {
                 $redoublement2 = new Redoublements2();
                 $redoublement2->setNiveau($niveau7eme);
                 $redoublement2->setRedoublement1($redoublement1);
-                $redoublement2->addScolarites1($scolarite1);
-                $redoublement2->addScolarites2($scolarite2);
+                $redoublement2->setScolarite1($scolarite1);
+                $redoublement2->setScolarite2($scolarite2);
                 $manager->persist($redoublement2);
             }
         }
@@ -140,23 +142,23 @@ class Redoublements7emeFixtures extends Fixture implements DependentFixtureInter
         for ($i = 0; $i < 6; $i++) {
             $redoublement1 = new Redoublements1();
             $redoublement1->setNiveau($this->getNiveauByIndex($i, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-            $redoublement1->addScolarites1($scolarite1);
-            $redoublement1->addScolarites2($scolarite2);
+            $redoublement1->setScolarite1($scolarite1);
+            $redoublement1->setScolarite2($scolarite2);
             $manager->persist($redoublement1);
 
             for ($a = 0; $a < 5 - $i; $a++) {
                 $redoublement2 = new Redoublements2();
                 $redoublement2->setNiveau($this->getNiveauByIndex($a + $i + 1, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
                 $redoublement2->setRedoublement1($redoublement1);
-                $redoublement2->addScolarites1($scolarite1);
-                $redoublement2->addScolarites2($scolarite2);
+                $redoublement2->setScolarite1($scolarite1);
+                $redoublement2->setScolarite2($scolarite2);
                 $manager->persist($redoublement2);
 
                 $redoublement3 = new Redoublements3();
                 $redoublement3->setNiveau($niveau7eme);
                 $redoublement3->setRedoublement2($redoublement2);
-                $redoublement3->addScolarites1($scolarite1);
-                $redoublement3->addScolarites2($scolarite2);
+                $redoublement3->setScolarite1($scolarite1);
+                $redoublement3->setScolarite2($scolarite2);
                 $manager->persist($redoublement3);
             }
         }
@@ -165,13 +167,20 @@ class Redoublements7emeFixtures extends Fixture implements DependentFixtureInter
     private function getNiveauByIndex(int $index, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme)
     {
         switch ($index) {
-            case 0: return $niveau1ere;
-            case 1: return $niveau2eme;
-            case 2: return $niveau3eme;
-            case 3: return $niveau4eme;
-            case 4: return $niveau5eme;
-            case 5: return $niveau6eme;
-            default: throw new \InvalidArgumentException("Index de niveau invalide.");
+            case 0:
+                return $niveau1ere;
+            case 1:
+                return $niveau2eme;
+            case 2:
+                return $niveau3eme;
+            case 3:
+                return $niveau4eme;
+            case 4:
+                return $niveau5eme;
+            case 5:
+                return $niveau6eme;
+            default:
+                throw new \InvalidArgumentException("Index de niveau invalide.");
         }
     }
 

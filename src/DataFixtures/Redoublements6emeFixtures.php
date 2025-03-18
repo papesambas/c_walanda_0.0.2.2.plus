@@ -46,8 +46,8 @@ class Redoublements6emeFixtures extends Fixture implements DependentFixtureInter
                         for ($i = 0; $i < 6; $i++) {
                             $redoublement1 = new Redoublements1();
                             $redoublement1->setNiveau($this->getNiveauByIndex($i, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-                            $redoublement1->addScolarites1($scolarite1);
-                            $redoublement1->addScolarites2($scolarite2);
+                            $redoublement1->setScolarite1($scolarite1);
+                            $redoublement1->setScolarite2($scolarite2);
                             $manager->persist($redoublement1);
 
                             // Ajout du 1er redoublement 6ème année
@@ -55,8 +55,8 @@ class Redoublements6emeFixtures extends Fixture implements DependentFixtureInter
                                 $redoublement2 = new Redoublements2();
                                 $redoublement2->setNiveau($niveau6eme);
                                 $redoublement2->setRedoublement1($redoublement1);
-                                $redoublement2->addScolarites1($scolarite1);
-                                $redoublement2->addScolarites2($scolarite2);
+                                $redoublement2->setScolarite1($scolarite1);
+                                $redoublement2->setScolarite2($scolarite2);
                                 $manager->persist($redoublement2);
                             }
                         }
@@ -64,16 +64,16 @@ class Redoublements6emeFixtures extends Fixture implements DependentFixtureInter
                         for ($i = 0; $i < 6; $i++) {
                             $redoublement1 = new Redoublements1();
                             $redoublement1->setNiveau($this->getNiveauByIndex($i, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-                            $redoublement1->addScolarites1($scolarite1);
-                            $redoublement1->addScolarites2($scolarite2);
+                            $redoublement1->setScolarite1($scolarite1);
+                            $redoublement1->setScolarite2($scolarite2);
                             $manager->persist($redoublement1);
 
                             for ($a = 0; $a < 5 - $i; $a++) {
                                 $redoublement2 = new Redoublements2();
                                 $redoublement2->setNiveau($this->getNiveauByIndex($a + $i + 1, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
                                 $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
-                                $redoublement2->addScolarites1($scolarite1);
-                                $redoublement2->addScolarites2($scolarite2);
+                                $redoublement2->setScolarite1($scolarite1);
+                                $redoublement2->setScolarite2($scolarite2);
                                 $manager->persist($redoublement2);
 
                                 // Ajout du 2ème redoublement 6ème année
@@ -81,8 +81,8 @@ class Redoublements6emeFixtures extends Fixture implements DependentFixtureInter
                                     $redoublement3 = new Redoublements3();
                                     $redoublement3->setNiveau($niveau6eme);
                                     $redoublement3->setRedoublement2($redoublement2);
-                                    $redoublement3->addScolarites1($scolarite1);
-                                    $redoublement3->addScolarites2($scolarite2);
+                                    $redoublement3->setScolarite1($scolarite1);
+                                    $redoublement3->setScolarite2($scolarite2);
                                     $manager->persist($redoublement3);
                                 }
                             }
@@ -91,16 +91,16 @@ class Redoublements6emeFixtures extends Fixture implements DependentFixtureInter
                         for ($i = 0; $i < 6; $i++) {
                             $redoublement1 = new Redoublements1();
                             $redoublement1->setNiveau($this->getNiveauByIndex($i, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-                            $redoublement1->addScolarites1($scolarite1);
-                            $redoublement1->addScolarites2($scolarite2);
+                            $redoublement1->setScolarite1($scolarite1);
+                            $redoublement1->setScolarite2($scolarite2);
                             $manager->persist($redoublement1);
 
                             for ($a = 0; $a < 5 - $i; $a++) {
                                 $redoublement2 = new Redoublements2();
                                 $redoublement2->setNiveau($this->getNiveauByIndex($a + $i + 1, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
                                 $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
-                                $redoublement2->addScolarites1($scolarite1);
-                                $redoublement2->addScolarites2($scolarite2);
+                                $redoublement2->setScolarite1($scolarite1);
+                                $redoublement2->setScolarite2($scolarite2);
                                 $manager->persist($redoublement2);
 
                                 // Ajout du 2ème redoublement 6ème année
@@ -108,8 +108,8 @@ class Redoublements6emeFixtures extends Fixture implements DependentFixtureInter
                                     $redoublement3 = new Redoublements3();
                                     $redoublement3->setNiveau($niveau6eme);
                                     $redoublement3->setRedoublement2($redoublement2);
-                                    $redoublement3->addScolarites1($scolarite1);
-                                    $redoublement3->addScolarites2($scolarite2);
+                                    $redoublement3->setScolarite1($scolarite1);
+                                    $redoublement3->setScolarite2($scolarite2);
                                     $manager->persist($redoublement3);
                                 }
                             }

@@ -136,7 +136,7 @@ class ElevesType extends AbstractType
                 ],
                 'error_bubbling' => false,
             ])
-            ->add('isActif', CheckboxType::class, [
+            /*->add('isActif', CheckboxType::class, [
                 'label' => 'Actif(ve)',
                 'required' => false,
             ])
@@ -147,7 +147,7 @@ class ElevesType extends AbstractType
             ->add('isAdmin', CheckboxType::class, [
                 'label' => 'Admis(e)',
                 'required' => false,
-            ])
+            ])*/
             ->add('isHandicap', CheckboxType::class, [
                 'label' => 'Handicapé(e)',
                 'required' => false,
@@ -156,12 +156,13 @@ class ElevesType extends AbstractType
                 'attr' => ['placeholder' => "Nature handicape"],
                 'required' => false,
             ])
-            ->add('parent', EntityType::class, [
+            /*->add('parent', EntityType::class, [
                 'class' => Parents::class,
                 'choice_label' => 'id',
-            ])
+            ])*/
             ->add('numeroExtrait', TextType::class, [
                 'attr' => ['placeholder' => "Numéro Extrait de Naissance"],
+                'required' => true,
                 'error_bubbling' => false,
             ])
             ->add('region', EntityType::class, [
@@ -267,21 +268,9 @@ class ElevesType extends AbstractType
                     $isNewRegistration = $form ? !$form : true;
                     $this->addStatutsField($form, $niveau, $isNewRegistration);
                     $this->addScolarites2Field($form, $scolarite1);
-                    if ($scolarite1 !== null && $scolarite2 !== null) {
-                        $this->addRedoublements1Field($form, $scolarite1, $scolarite2);
-                    } else {
-                        $this->addRedoublements1Field($form, null, null);
-                    }
-                    if ($scolarite1 !== null && $scolarite2 !== null && $redoublement1 !== null) {
-                        $this->addRedoublements2Field($form, $redoublement1, $scolarite1, $scolarite2);
-                    } else {
-                        $this->addRedoublements2Field($form, null, null, null);
-                    }
-                    if ($scolarite1 !== null && $scolarite2 !== null  && $redoublement2 !== null) {
-                        $this->addRedoublements3Field($form, $redoublement2, $scolarite1, $scolarite2);
-                    } else {
-                        $this->addRedoublements3Field($form, null, null, null);
-                    }
+                    $this->addRedoublements1Field($form, $scolarite2);
+                    $this->addRedoublements2Field($form, $redoublement1);
+                    $this->addRedoublements3Field($form, $redoublement2);
                     $form->get('niveau')->setData($niveau);
                     $form->get('scolarite1')->setData($scolarite1);
                 } else {
@@ -291,9 +280,9 @@ class ElevesType extends AbstractType
                     $isNewRegistration = $form ? !$form : true;
                     $this->addStatutsField($form, null, $isNewRegistration);
                     $this->addScolarites2Field($form, null);
-                    $this->addRedoublements1Field($form, null, null);
-                    $this->addRedoublements2Field($form, null, null, null);
-                    $this->addRedoublements3Field($form, null, null, null);
+                    $this->addRedoublements1Field($form, null);
+                    $this->addRedoublements2Field($form, null);
+                    $this->addRedoublements3Field($form, null);
                 }
             }
         );
@@ -398,7 +387,7 @@ class ElevesType extends AbstractType
             'attr' => [
                 'class' => 'select-lieu'
             ],
-            'required' => false,
+            'required' => true,
             'error_bubbling' => false,
         ]);
     }
@@ -417,7 +406,7 @@ class ElevesType extends AbstractType
             'attr' => [
                 'class' => 'select-classe'
             ],
-            'required' => false,
+            'required' => true,
             'error_bubbling' => false,
         ]);
     }
@@ -439,6 +428,7 @@ class ElevesType extends AbstractType
                 'attr' => [
                     'class' => 'select-statut'
                 ],
+                'required' => true,
                 'error_bubbling' => false,
             ]);
         } else {
@@ -455,6 +445,7 @@ class ElevesType extends AbstractType
                 'attr' => [
                     'class' => 'select-statut'
                 ],
+                'required' => true,
                 'error_bubbling' => false,
             ]);
         }
@@ -533,18 +524,18 @@ class ElevesType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
                 $data = $form->getData();
-                dump($data);
-                $this->addRedoublements1Field($form->getParent(), $form->getData()->getScolarite1(), $form->getData());
+                $this->addRedoublements1Field($form->getParent(), $form->getData());
             }
         );
 
         $form->add($builder->getForm());
     }
 
-    public function addRedoublements1Field(FormInterface $form, ?Scolarites1 $scolarites1, ?Scolarites2 $scolarites2): void
+    public function addRedoublements1Field(FormInterface $form,?Scolarites2 $scolarites2): void
     {
+        $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1():null;
         // Récupérez les Redoublements1 depuis le repository
-        $redoublements1 = $this->redoublements1Repository->findByScolarites1AndScolarites2($scolarites1, $scolarites2);
+        $redoublements1 = $this->redoublements1Repository->findByScolarites1AndScolarites2($scolarite1, $scolarites2);
 
         $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
             'redoublement1',
@@ -571,27 +562,17 @@ class ElevesType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
                 $data = $form->getData();
-                dump($data);
-                foreach ($form->getData()->getScolarites1() as $scolarite1) {
-                    if ($scolarite1) {
-                        foreach ($form->getData()->getScolarites2() as $scolarite2) {
-                            if ($scolarite2) {
-                                $this->addRedoublements2Field($form->getParent(), $form->getData(), $scolarite1, $scolarite2);
-                            }
-                        }
-                    }
-                }
+                $this->addRedoublements2Field($form->getParent(), $form->getData());
             }
         );
 
         $form->add($builder->getForm());
     }
 
-    public function addRedoublements2Field(FormInterface $form, ?Redoublements1 $redoublements1, ?Scolarites1 $scolarites1, ?Scolarites2 $scolarites2): void
+    public function addRedoublements2Field(FormInterface $form, ?Redoublements1 $redoublements1): void
     {
-        // Récupérez les Redoublements1 depuis le repository
-        $redoublements2 = $this->redoublements2Repository->findByRedoublement1AndScolarites1AndScolarites2($redoublements1, $scolarites1, $scolarites2);
-        dump($redoublements2);
+            $redoublements2 = $this->redoublements2Repository->findByRedoublement1($redoublements1);
+        //dump($redoublements2);
         $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
             'redoublement2',
             EntityType::class,
@@ -601,7 +582,7 @@ class ElevesType extends AbstractType
                 'choice_label' => 'niveau', // Assurez-vous que 'niveau' est une propriété valide de Redoublements1
                 'label' => '2nd Redoub :',
                 'auto_initialize' => false,
-                'choices' => $redoublements2, // Utilisez les résultats du repository
+                'choices' => $redoublements2 ? $redoublements2 : [] , // Utilisez les résultats du repository
                 'placeholder' => $redoublements2 ? '** ** ' : '## ##',
                 'attr' => [
                     'class' => 'select-redoublement'
@@ -617,27 +598,28 @@ class ElevesType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
                 $data = $form->getData();
-                // Vous pouvez ajouter d'autres logiques ici si nécessaire
+                $this->addRedoublements3Field($form->getParent(), $form->getData());
             }
         );
 
         $form->add($builder->getForm());
     }
 
-    public function addRedoublements3Field(FormInterface $form, ?Redoublements2 $redoublements2, ?Scolarites1 $scolarites1, ?Scolarites2 $scolarites2): void
+    public function addRedoublements3Field(FormInterface $form, ?Redoublements2 $redoublements2): void
     {
         // Récupérez les Redoublements1 depuis le repository
-        $redoublements3 = $this->redoublements3Repository->findByRedoublement2AndScolarites1AndScolarites2($redoublements2, $scolarites1, $scolarites2);
+        $redoublements3 = $this->redoublements3Repository->findByRedoublement2($redoublements2);
         dump($redoublements3);
-        $form->add(
+        $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
             'redoublement3',
             EntityType::class,
+            null,
             [
                 'class' => Redoublements3::class,
                 'choice_label' => 'niveau', // Assurez-vous que 'niveau' est une propriété valide de Redoublements1
-                'label' => '3ème Redoub :',
+                'label' => '3nd Redoub :',
                 'auto_initialize' => false,
-                'choices' => $redoublements3, // Utilisez les résultats du repository
+                'choices' => $redoublements3 ? $redoublements3 : [] , // Utilisez les résultats du repository
                 'placeholder' => $redoublements3 ? '** ** ' : '## ##',
                 'attr' => [
                     'class' => 'select-redoublement'
@@ -647,6 +629,17 @@ class ElevesType extends AbstractType
                 'error_bubbling' => false,
             ]
         );
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $form->getData();
+                $this->addRedoublements3Field($form->getParent(), $form->getData());
+            }
+        );
+
+        $form->add($builder->getForm());
     }
 
 

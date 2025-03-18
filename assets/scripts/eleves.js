@@ -71,53 +71,109 @@ $(document).ready(function () {
         }
     });
 
-        //Gérer le chargement du statut
-        $('#eleves_niveau').change(function () {
-            let niveauId = $(this).val();
-            if (niveauId) {
-                $.ajax({
-                    url: '/eleves/statuts-by-niveau/' + niveauId,
-                    type: 'GET',
-                    success: function (data) {
-                        $('#eleves_statut').html(data);
-                    }
-                });
-            } else {
-                $('#eleves_statut').html('<option value="">Choisir un statut</option>');
-            }
-        });
-    
-        //Gérer le chargement du scolarites1
-        $('#eleves_niveau').change(function () {
-            let niveauId = $(this).val();
-            if (niveauId) {
-                $.ajax({
-                    url: '/eleves/scolarites1-by-niveau/' + niveauId,
-                    type: 'GET',
-                    success: function (data) {
-                        $('#eleves_scolarite1').html(data);
-                    }
-                });
-            } else {
-                $('#eleves_scolarite1').html('<option value="">Choisir une scolarite</option>');
-            }
-        });
+    //Gérer le chargement du statut
+    $('#eleves_niveau').change(function () {
+        let niveauId = $(this).val();
+        if (niveauId) {
+            $.ajax({
+                url: '/eleves/statuts-by-niveau/' + niveauId,
+                type: 'GET',
+                success: function (data) {
+                    $('#eleves_statut').html(data);
+                }
+            });
+        } else {
+            $('#eleves_statut').html('<option value="">Choisir un statut</option>');
+        }
+    });
 
-        //Gérer le chargement du scolarites2
-        $('#eleves_scolarite1').change(function () {
-            let scolarite1Id = $(this).val();
-            if (scolarite1Id) {
-                $.ajax({
-                    url: '/eleves/scolarites2-by-scolarite1/' + scolarite1Id,
-                    type: 'GET',
-                    success: function (data) {
-                        $('#eleves_scolarite2').html(data);
-                    }
-                });
-            } else {
-                $('#eleves_scolarite2').html('<option value="">Choisir une scolarite</option>');
-            }
-        });
+    //Gérer le chargement du scolarites1
+    $('#eleves_niveau').change(function () {
+        let niveauId = $(this).val();
+        if (niveauId) {
+            $.ajax({
+                url: '/eleves/scolarites1-by-niveau/' + niveauId,
+                type: 'GET',
+                success: function (data) {
+                    $('#eleves_scolarite1').html(data);
+                }
+            });
+        } else {
+            $('#eleves_scolarite1').html('<option value="">Choisir une scolarite</option>');
+        }
+    });
+
+    //Gérer le chargement du scolarites2
+    $('#eleves_scolarite1').change(function () {
+        let scolarite1Id = $(this).val();
+        if (scolarite1Id) {
+            $.ajax({
+                url: '/eleves/scolarites2-by-scolarite1/' + scolarite1Id,
+                type: 'GET',
+                success: function (data) {
+                    $('#eleves_scolarite2').html(data);
+                }
+            });
+        } else {
+            $('#eleves_scolarite2').html('<option value="">Choisir une scolarite</option>');
+        }
+    });
+
+    //Gérer le chargement de redoublement1
+    $('#eleves_scolarite2').change(function () {
+        let scolarite2Id = $(this).val();
+        if (scolarite2Id) {
+            $.ajax({
+                url: '/eleves/redoublement1-by-scolarite2/' + scolarite2Id,
+                type: 'GET',
+                success: function (data) {
+                    $('#eleves_redoublement1').html(data);
+                    $('#eleves_redoublement2').html('<option value="">Choisir un remboursement</option>');
+                    $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
         
+                }
+            });
+        } else {
+            $('#eleves_redoublement1').html('<option value="">Choisir un remboursement</option>');
+            $('#eleves_redoublement2').html('<option value="">Choisir un remboursement</option>');
+            $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+
+        }
+    });
+
+    //Gérer le chargement de redoublement2
+    $('#eleves_redoublement1').change(function () {
+        let redoublement1Id = $(this).val();
+        if (redoublement1Id) {
+            $.ajax({
+                url: '/eleves/redoublement2-by-redoublement1/' + redoublement1Id,
+                type: 'GET',
+                success: function (data) {
+                    $('#eleves_redoublement2').html(data);
+                    $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+                }
+            });
+        } else {
+            $('#eleves_redoublement2').html('<option value="">Choisir un remboursement</option>');
+            $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+        }
+    });
+
+    //Gérer le chargement de redoublement3
+    $('#eleves_redoublement2').change(function () {
+        let redoublement2Id = $(this).val();
+        if (redoublement2Id) {
+            $.ajax({
+                url: '/eleves/redoublement3-by-redoublement2/' + redoublement2Id,
+                type: 'GET',
+                success: function (data) {
+                    $('#eleves_redoublement3').html(data);
+                }
+            });
+        } else {
+            $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+        }
+    });
+
 
 });

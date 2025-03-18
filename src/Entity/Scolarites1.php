@@ -41,19 +41,19 @@ class Scolarites1
     /**
      * @var Collection<int, Redoublements1>
      */
-    #[ORM\ManyToMany(targetEntity: Redoublements1::class, mappedBy: 'scolarites1')]
+    #[ORM\OneToMany(targetEntity: Redoublements1::class, mappedBy: 'scolarite1')]
     private Collection $redoublements1s;
 
     /**
      * @var Collection<int, Redoublements2>
      */
-    #[ORM\ManyToMany(targetEntity: Redoublements2::class, mappedBy: 'scolarites1')]
+    #[ORM\OneToMany(targetEntity: Redoublements2::class, mappedBy: 'scolarite1')]
     private Collection $redoublements2s;
 
     /**
      * @var Collection<int, Redoublements3>
      */
-    #[ORM\ManyToMany(targetEntity: Redoublements3::class, mappedBy: 'scolarites1')]
+    #[ORM\OneToMany(targetEntity: Redoublements3::class, mappedBy: 'scolarite1')]
     private Collection $redoublements3s;
 
     public function __construct()
@@ -171,7 +171,7 @@ class Scolarites1
     {
         if (!$this->redoublements1s->contains($redoublements1)) {
             $this->redoublements1s->add($redoublements1);
-            $redoublements1->addScolarites1($this);
+            $redoublements1->setScolarite1($this);
         }
 
         return $this;
@@ -180,7 +180,10 @@ class Scolarites1
     public function removeRedoublements1(Redoublements1 $redoublements1): static
     {
         if ($this->redoublements1s->removeElement($redoublements1)) {
-            $redoublements1->removeScolarites1($this);
+            // set the owning side to null (unless already changed)
+            if ($redoublements1->getScolarite1() === $this) {
+                $redoublements1->setScolarite1(null);
+            }
         }
 
         return $this;
@@ -198,7 +201,7 @@ class Scolarites1
     {
         if (!$this->redoublements2s->contains($redoublements2)) {
             $this->redoublements2s->add($redoublements2);
-            $redoublements2->addScolarites1($this);
+            $redoublements2->setScolarite1($this);
         }
 
         return $this;
@@ -207,7 +210,10 @@ class Scolarites1
     public function removeRedoublements2(Redoublements2 $redoublements2): static
     {
         if ($this->redoublements2s->removeElement($redoublements2)) {
-            $redoublements2->removeScolarites1($this);
+            // set the owning side to null (unless already changed)
+            if ($redoublements2->getScolarite1() === $this) {
+                $redoublements2->setScolarite1(null);
+            }
         }
 
         return $this;
@@ -225,7 +231,7 @@ class Scolarites1
     {
         if (!$this->redoublements3s->contains($redoublements3)) {
             $this->redoublements3s->add($redoublements3);
-            $redoublements3->addScolarites1($this);
+            $redoublements3->setScolarite1($this);
         }
 
         return $this;
@@ -234,9 +240,13 @@ class Scolarites1
     public function removeRedoublements3(Redoublements3 $redoublements3): static
     {
         if ($this->redoublements3s->removeElement($redoublements3)) {
-            $redoublements3->removeScolarites1($this);
+            // set the owning side to null (unless already changed)
+            if ($redoublements3->getScolarite1() === $this) {
+                $redoublements3->setScolarite1(null);
+            }
         }
 
         return $this;
     }
+
 }

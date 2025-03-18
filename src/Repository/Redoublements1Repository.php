@@ -32,8 +32,8 @@ class Redoublements1Repository extends ServiceEntityRepository
         }
 
         return $this->createQueryBuilder('r')
-            ->innerJoin('r.scolarites1', 's1') // Jointure avec Scolarites1
-            ->innerJoin('r.scolarites2', 's2') // Jointure avec Scolarites2
+            ->innerJoin('r.scolarite1', 's1') // Jointure avec Scolarites1
+            ->innerJoin('r.scolarite2', 's2') // Jointure avec Scolarites2
             ->andWhere('s1 = :scolarite1')     // Filtre sur Scolarites1
             ->andWhere('s2 = :scolarite2')     // Filtre sur Scolarites2
             ->setParameter('scolarite1', $scolarites1)

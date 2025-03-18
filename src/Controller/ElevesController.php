@@ -15,13 +15,16 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Scolarites1Repository;
 use App\Repository\Scolarites2Repository;
 use App\Service\DateConfigurationService;
+use Symfony\Bundle\SecurityBundle\Security;
 use App\Repository\LieuNaissancesRepository;
+use App\Repository\Redoublements1Repository;
+use App\Repository\Redoublements2Repository;
+use App\Repository\Redoublements3Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 
 #[Route('/eleves')]
 final class ElevesController extends AbstractController
@@ -199,6 +202,42 @@ final class ElevesController extends AbstractController
         }
         return new Response($html);
     }
+
+    #[Route('/redoublement1-by-scolarite2/{scolarite2Id}', name: 'redoublement1_by_scolarite2')]
+    public function getRedoublement1ByScolarite2(int $scolarite2Id,Scolarites2Repository $scolarites2Repository, Redoublements1Repository $redoublements1Repository): Response
+    {
+        $scolarites2 = $scolarites2Repository->findOneBy(['id' => $scolarite2Id]);
+        $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1():null;
+        $redoublements1 = $redoublements1Repository->findByScolarites1AndScolarites2($scolarite1, $scolarites2);
+        $html = '<option value="">Choisir un redoublement</option>';
+        foreach ($redoublements1 as $redoublement1) {
+            $html .= '<option value="' . $redoublement1->getId() . '">' . $redoublement1->getNiveau() . '</option>';
+        }
+        return new Response($html);
+    }
+
+    #[Route('/redoublement2-by-redoublement1/{redoublement1Id}', name: 'redoublement2_by_redoublement1')]
+    public function getRedoublement2ByRedoublement1(int $redoublement1Id, Redoublements2Repository $redoublements2Repository): Response
+    {
+        $redoublements2 = $redoublements2Repository->findBy(['redoublement1' => $redoublement1Id]);
+        $html = '<option value="">Choisir un redoublement</option>';
+        foreach ($redoublements2 as $redoublement2) {
+            $html .= '<option value="' . $redoublement2->getId() . '">' . $redoublement2->getNiveau() . '</option>';
+        }
+        return new Response($html);
+    }
+
+    #[Route('/redoublement3-by-redoublement2/{redoublement2Id}', name: 'redoublement3_by_redoublement2')]
+    public function getRedoublement3ByRedoublement2(int $redoublement2Id, Redoublements3Repository $redoublements3Repository): Response
+    {
+        $redoublements3 = $redoublements3Repository->findBy(['redoublement2' => $redoublement2Id]);
+        $html = '<option value="">Choisir un redoublement</option>';
+        foreach ($redoublements3 as $redoublement3) {
+            $html .= '<option value="' . $redoublement3->getId() . '">' . $redoublement3->getNiveau() . '</option>';
+        }
+        return new Response($html);
+    }
+
 
 
     /*#[Route('/dates-by-niveau/{id}', name: 'eleves_dates_by_niveau', methods: ['GET'])]
