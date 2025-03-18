@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Entity\Eleves;
 use App\Form\ElevesType;
+use App\Entity\DossierEleves;
 use App\Repository\ElevesRepository;
 use App\Repository\CerclesRepository;
 use App\Repository\ClassesRepository;
 use App\Repository\NiveauxRepository;
 use App\Repository\ParentsRepository;
 use App\Repository\StatutsRepository;
+use App\Service\RoleHierarchyService;
 use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Scolarites1Repository;
@@ -24,7 +27,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/eleves')]
 final class ElevesController extends AbstractController
@@ -45,15 +51,24 @@ final class ElevesController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
-        ParentsRepository $parentsRepository
+        ParentsRepository $parentsRepository,
+        RoleHierarchyService $roleHierarchyService,
+        RoleHierarchyInterface $roleHierarchy,
+        SluggerInterface $slugger,
+        UserPasswordHasherInterface $PasswordHasher,
     ): Response {
         $elefe = new Eleves();
 
-        /*$user = $this->security->getUser();
-        if(!$user){
+        $user = $this->security->getUser();
+        if (!$user) {
             $this->addFlash('error', 'Vous devez être connecté');
             return $this->redirectToRoute('app_login', [], Response::HTTP_SEE_OTHER);
         }
+
+        // Récupération des rôles hérités de l'utilisateur
+        $allUserRoles = $roleHierarchyService->getUserRolesWithHierarchy($roleHierarchy, $user);
+        dump($allUserRoles); // Vérifie dans la barre de debug si les rôles sont bien récupérés
+
 
         // Vérifier si un parent est passé en paramètre
         if (!$request->query->has('parent_id')) {
@@ -68,17 +83,71 @@ final class ElevesController extends AbstractController
         } else {
             $this->addFlash('error', 'Le parent spécifié n\'existe pas.');
             return $this->redirectToRoute('app_parents_index', [], Response::HTTP_SEE_OTHER);
-        }*/
+        }
 
-        $form = $this->createForm(ElevesType::class, $elefe);
+        $form = $this->createForm(ElevesType::class, $elefe, [
+            'canEditAdmis' => in_array('ROLE_ADMIN', $allUserRoles) || in_array('ROLE_DIRECTION', $allUserRoles),
+            'userRoles' => $allUserRoles, // ✅ Passer les rôles hérités au formulaire
+        ]);
         $form->handleRequest($request);
+        //dd($request->request->all());
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //$entityManager->persist($elefe);
-            //$entityManager->flush();
+            try {
+                $documents = $form->get('document')->getData();
+                //$extrait = $form->get('extrait')->getData();
+                foreach ($documents as $document) {
+                    $originalFilename = pathinfo($document->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $document->guessExtension();
+                    $fichier = md5(uniqid()) . '.' . $document->guessExtension();
 
-            $this->addFlash('success', 'L\'élève a été créé avec succès.');
-            //return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
+                    //On copie le fichier dans le dossier upload
+                    $document->move(
+                        $this->getParameter('documents_eleves_directory'),
+                        $originalFilename
+                    );
+
+                    //On stock le nom du document dans la base de donnée
+                    $docum = new DossierEleves;
+                    $docum->setDesignation($originalFilename);
+                    $docum->setSlug($fichier);
+                    $elefe->addDossierElefe($docum);
+                }
+
+                $suffix = substr(time(), -4);
+
+                $user = new Users();
+                $password = 'password';
+                $email = "inscription@EMPT.edu";
+                $userNom = $elefe->getNom();
+                $userPrenom = $elefe->getPrenom();
+                $userFullname = $elefe->getNom() . ' ' . $elefe->getPrenom();
+                $username = $elefe->getNom() . ' ' . $elefe->getPrenom() . $suffix;
+                $user->setEmail($email);
+                $user->setFullname($userFullname);
+                $user->setNom($userNom);
+                $user->setPrenom($userPrenom);
+                $user->setPassword($PasswordHasher->hashPassword($user, $password));
+                $user->setUsername($username);
+                $user->setRoles(['ROLE_ELEVE']);
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                $elefe->setUser($user);
+                $user->setEleve($elefe);
+
+                //$entityManager->persist($elefe);
+                //$entityManager->flush();
+
+                $this->addFlash('success', 'L\'élève a été créé avec succès.');
+                //return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                // Journalisation de l'erreur
+                $this->addFlash('error', 'Une erreur s\'est produite lors de l\'enregistrement des modifications.');
+                // Vous pouvez également logger l'erreur pour un débogage ultérieur
+                // $this->logger->error('Erreur lors de la modification de l\'élève : ' . $e->getMessage());
+            }
         }
 
         return $this->render('eleves/new.html.twig', [
@@ -96,15 +165,75 @@ final class ElevesController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_eleves_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Eleves $elefe, EntityManagerInterface $entityManager): Response
-    {
+    public function edit(
+        Request $request,
+        Eleves $elefe,
+        EntityManagerInterface $entityManager,
+        SluggerInterface $slugger,
+        UserPasswordHasherInterface $PasswordHasher,
+
+    ): Response {
         $form = $this->createForm(ElevesType::class, $elefe);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
 
-            return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $documents = $form->get('document')->getData();
+                //$extrait = $form->get('extrait')->getData();
+                foreach ($documents as $document) {
+                    $originalFilename = pathinfo($document->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $document->guessExtension();
+                    $fichier = md5(uniqid()) . '.' . $document->guessExtension();
+
+                    //On copie le fichier dans le dossier upload
+                    $document->move(
+                        $this->getParameter('documents_eleves_directory'),
+                        $originalFilename
+                    );
+
+                    //On stock le nom du document dans la base de donnée
+                    $docum = new DossierEleves;
+                    $docum->setDesignation($originalFilename);
+                    $docum->setSlug($fichier);
+                    $elefe->addDossierElefe($docum);
+                }
+
+                $user = $elefe->getUser();
+                if (!$user) {
+                    $suffix = substr(time(), -4);
+
+                    $user = new Users();
+                    $password = 'password';
+                    $email = "inscription@EMPT.edu";
+                    $userNom = $elefe->getNom();
+                    $userPrenom = $elefe->getPrenom();
+                    $userFullname = $elefe->getNom() . ' ' . $elefe->getPrenom();
+                    $username = $elefe->getNom() . ' ' . $elefe->getPrenom() . $suffix;
+                    $user->setEmail($email);
+                    $user->setFullname($userFullname);
+                    $user->setNom($userNom);
+                    $user->setPrenom($userPrenom);
+                    $user->setPassword($PasswordHasher->hashPassword($user, $password));
+                    $user->setUsername($username);
+                    $user->setRoles(['ROLE_ELEVE']);
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+
+                    $elefe->setUser($user);
+                    $user->setEleve($elefe);
+                }
+
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                // Journalisation de l'erreur
+                $this->addFlash('error', 'Une erreur s\'est produite lors de l\'enregistrement des modifications.');
+                // Vous pouvez également logger l'erreur pour un débogage ultérieur
+                // $this->logger->error('Erreur lors de la modification de l\'élève : ' . $e->getMessage());
+            }
         }
 
         return $this->render('eleves/edit.html.twig', [
@@ -173,7 +302,6 @@ final class ElevesController extends AbstractController
     public function getStatutsByNiveau(int $niveauId, StatutsRepository $statutsRepository): Response
     {
         $statuts = $statutsRepository->findByNiveau($niveauId);
-        dump($statuts);
         $html = '<option value="">Choisir un niveau</option>';
         foreach ($statuts as $statut) {
             $html .= '<option value="' . $statut->getId() . '">' . $statut->getDesignation() . '</option>';
@@ -204,10 +332,10 @@ final class ElevesController extends AbstractController
     }
 
     #[Route('/redoublement1-by-scolarite2/{scolarite2Id}', name: 'redoublement1_by_scolarite2')]
-    public function getRedoublement1ByScolarite2(int $scolarite2Id,Scolarites2Repository $scolarites2Repository, Redoublements1Repository $redoublements1Repository): Response
+    public function getRedoublement1ByScolarite2(int $scolarite2Id, Scolarites2Repository $scolarites2Repository, Redoublements1Repository $redoublements1Repository): Response
     {
         $scolarites2 = $scolarites2Repository->findOneBy(['id' => $scolarite2Id]);
-        $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1():null;
+        $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1() : null;
         $redoublements1 = $redoublements1Repository->findByScolarites1AndScolarites2($scolarite1, $scolarites2);
         $html = '<option value="">Choisir un redoublement</option>';
         foreach ($redoublements1 as $redoublement1) {

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Departs{% endblock %}
+
+{% block body %}
+    <h1>Departs</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ depart.id }}</td>
+            </tr>
+            <tr>
+                <th>DateDepart</th>
+                <td>{{ depart.dateDepart ? depart.dateDepart|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>EcoleDestination</th>
+                <td>{{ depart.ecoleDestination }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_departs_index') }}">back to list</a>
+
+    <a href="{{ path('app_departs_edit', {'id': depart.id}) }}">edit</a>
+
+    {{ include('departs/_delete_form.html.twig') }}
+{% endblock %}

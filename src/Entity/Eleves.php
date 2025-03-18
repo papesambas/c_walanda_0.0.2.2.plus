@@ -2,27 +2,45 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use App\Entity\Trait\SlugTrait;
 use App\Repository\ElevesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ElevesRepository::class)]
+#[Vich\Uploadable]
 
 class Eleves
 {
+    use CreatedAtTrait;
+    use SlugTrait;
+    use EntityTrackingTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    // NOTE: This is not a mapped field of entity metadata, just a simple property.
+    #[Vich\UploadableField(mapping: 'eleves_images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $imageName = null;
+
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
-    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',)]
     #[Assert\NotNull(message: "Le nom est obligatoire")]
     private ?Noms $nom = null;
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
-    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',)]
     #[Assert\NotNull(message: "Le prénom est obligatoire")]
 
     private ?Prenoms $prenom = null;
@@ -33,7 +51,7 @@ class Eleves
     private ?string $sexe = 'M';
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
-    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',)]
     private ?LieuNaissances $lieuNaissance = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
@@ -43,7 +61,7 @@ class Eleves
     private ?\DateTimeImmutable $dateRecrutement = null;
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: "LAZY")]
-    #[ORM\JoinColumn(nullable: false,referencedColumnName: 'id',)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',)]
     private ?Parents $parent = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
@@ -62,13 +80,13 @@ class Eleves
     private ?string $numeroExtrait = null;
 
     #[ORM\Column]
-    private ?bool $isActif = true;
+    private ?bool $isActif = false;
 
     #[ORM\Column]
     private ?bool $isAllowed = false;
 
     #[ORM\Column]
-    private ?bool $isAdmin = true;
+    private ?bool $isAdmis = false;
 
     #[ORM\Column]
     private ?bool $isHandicap = false;
@@ -80,7 +98,7 @@ class Eleves
     private ?string $fullname = null;
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',)]
     private ?Users $user = null;
 
     #[ORM\Column(length: 1)]
@@ -92,7 +110,7 @@ class Eleves
     private ?Classes $classe = null;
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',)]
     private ?Statuts $statut = null;
 
     #[ORM\ManyToOne(inversedBy: 'eleves')]
@@ -100,6 +118,34 @@ class Eleves
 
     #[ORM\ManyToOne(inversedBy: 'eleves')]
     private ?Scolarites2 $scolarite2 = null;
+
+    /**
+     * @var Collection<int, DossierEleves>
+     */
+    #[ORM\OneToMany(targetEntity: DossierEleves::class, mappedBy: 'eleves', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $dossierEleves;
+
+    #[ORM\OneToOne(mappedBy: 'eleve', cascade: ['persist', 'remove'])]
+    private ?Users $users = null;
+
+    /**
+     * @var Collection<int, Departs>
+     */
+    #[ORM\OneToMany(targetEntity: Departs::class, mappedBy: 'eleve', orphanRemoval: true, cascade: ['persist'])]
+    private Collection $departs;
+
+    /**
+     * @var Collection<int, Santes>
+     */
+    #[ORM\OneToMany(targetEntity: Santes::class, mappedBy: 'eleve')]
+    private Collection $santes;
+
+    public function __construct()
+    {
+        $this->dossierEleves = new ArrayCollection();
+        $this->departs = new ArrayCollection();
+        $this->santes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -249,14 +295,14 @@ class Eleves
         return $this;
     }
 
-    public function isAdmin(): ?bool
+    public function isAdmis(): ?bool
     {
-        return $this->isAdmin;
+        return $this->isAdmis;
     }
 
-    public function setIsAdmin(bool $isAdmin): static
+    public function setisAdmis(bool $isAdmis): static
     {
-        $this->isAdmin = $isAdmin;
+        $this->isAdmis = $isAdmis;
 
         return $this;
     }
@@ -368,4 +414,152 @@ class Eleves
 
         return $this;
     }
+
+        /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    /**
+     * @return Collection<int, DossierEleves>
+     */
+    public function getDossierEleves(): Collection
+    {
+        return $this->dossierEleves;
+    }
+
+    public function addDossierElefe(DossierEleves $dossierElefe): static
+    {
+        if (!$this->dossierEleves->contains($dossierElefe)) {
+            $this->dossierEleves->add($dossierElefe);
+            $dossierElefe->setEleves($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDossierElefe(DossierEleves $dossierElefe): static
+    {
+        if ($this->dossierEleves->removeElement($dossierElefe)) {
+            // set the owning side to null (unless already changed)
+            if ($dossierElefe->getEleves() === $this) {
+                $dossierElefe->setEleves(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUsers(): ?Users
+    {
+        return $this->users;
+    }
+
+    public function setUsers(?Users $users): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($users === null && $this->users !== null) {
+            $this->users->setEleve(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($users !== null && $users->getEleve() !== $this) {
+            $users->setEleve($this);
+        }
+
+        $this->users = $users;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Departs>
+     */
+    public function getDeparts(): Collection
+    {
+        return $this->departs;
+    }
+
+    public function addDepart(Departs $depart): static
+    {
+        if (!$this->departs->contains($depart)) {
+            $this->departs->add($depart);
+            $depart->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepart(Departs $depart): static
+    {
+        if ($this->departs->removeElement($depart)) {
+            // set the owning side to null (unless already changed)
+            if ($depart->getEleve() === $this) {
+                $depart->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Santes>
+     */
+    public function getSantes(): Collection
+    {
+        return $this->santes;
+    }
+
+    public function addSante(Santes $sante): static
+    {
+        if (!$this->santes->contains($sante)) {
+            $this->santes->add($sante);
+            $sante->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSante(Santes $sante): static
+    {
+        if ($this->santes->removeElement($sante)) {
+            // set the owning side to null (unless already changed)
+            if ($sante->getEleve() === $this) {
+                $sante->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

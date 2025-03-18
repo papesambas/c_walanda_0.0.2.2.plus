@@ -23,7 +23,6 @@ final class MeresController extends AbstractController
         $form = $this->createForm(SearchDataType::class, $data);
         $form->handleRequest($request);
         $meres = $meresRepository->findBySearchData($data);
-        dump('data_',$data, $meres);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les résultats filtrés en utilisant le repository

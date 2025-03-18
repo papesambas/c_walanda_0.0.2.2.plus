@@ -23,7 +23,6 @@ final class PeresController extends AbstractController
         $form = $this->createForm(SearchDataType::class, $data);
         $form->handleRequest($request);
         $peres = $peresRepository->findBySearchData($data);
-        dump('data_',$data, $peres);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les résultats filtrés en utilisant le repository

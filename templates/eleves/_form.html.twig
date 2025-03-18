@@ -1,14 +1,17 @@
 {# templates/eleves/new.html.twig #}
 
 {% block body %}
-<div class="container mt-4">
+<div >
     <h3 class="mb-4">Ajouter un élève</h3>
 
     {# Afficher le formulaire #}
     {{ form_start(form) }}
     {{ form_errors(form) }}
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-2">
+            {{ form_row(form.imageFile) }}
+        </div>
+        <div class="col-md-5">
             {# Section Informations personnelles #}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
@@ -33,7 +36,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-5">
             {# Section Informations scolaires #}
             <div class="card mb-4">
                 <div class="card-header bg-success text-white">
@@ -58,7 +61,11 @@
                         <div class="col-6">{{ form_row(form.redoublement3) }}</div>
                     </div>
 
-                    
+                    <div class="row">
+                        <div class="col-4">{{ form_row(form.isActif) }}</div>
+                        <div class="col-4">{{ form_row(form.isAdmis) }}</div>
+                        <div class="col-4">{{ form_row(form.isAllowed) }}</div>
+                    </div>
                     
                     
                 </div>
@@ -93,7 +100,7 @@
             Documents
         </div>
         <div class="card-body">
-            {#{{ form_row(form.document) }}#}
+            {{ form_row(form.document) }}
         </div>
     </div>
 

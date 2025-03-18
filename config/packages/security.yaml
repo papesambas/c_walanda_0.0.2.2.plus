@@ -42,6 +42,19 @@ security:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
+    role_hierarchy:
+        ROLE_ELEVES: ROLE_USER
+        ROLE_PARENT: ROLE_ELEVES
+        ROLE_EDUCATEUR: ROLE_PARENT
+        ROLE_SURVEILLANT: ROLE_EDUCATEUR
+        ROLE_SECRETAIRE: ROLE_SURVEILLANT
+        ROLE_CAISSE: ROLE_PARENT
+        ROLE_COMPTABLE: ROLE_CAISSE
+        ROLE_FINANCE: ROLE_COMPTABLE
+        ROLE_DIRECTION: [ROLE_SECRETAIRE, ROLE_CAISSE]
+        ROLE_ADMIN: [ROLE_DIRECTION, ROLE_COMPTABLE]
+        ROLE_SUPERADMIN: [ROLE_ADMIN, ROLE_FINANCE]
+        
 when@test:
     security:
         password_hashers:

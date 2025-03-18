@@ -29,13 +29,10 @@ final class ParentsController extends AbstractController
         // Recherche des pères et mères correspondants
         $peres = $peresRepository->findBySearchParentData($data);
         $meres = $meresRepository->findBySearchParentData($data);
-        dump($peres, $meres);
-
         
         if ($form->isSubmitted() && $form->isValid() && (!empty($peres) || !empty($meres))) {
             // Recherche des parents correspondants avec tous les pères et mères trouvés
             $parents = $parentsRepository->findByPereOrMere($peres, $meres);
-            dump($parents);
         } else {
             // Si aucun critère de recherche, affichez tous les parents
             $parents = $parentsRepository->findAll();
@@ -64,13 +61,10 @@ final class ParentsController extends AbstractController
             $peres = $peresRepository->findBySearchParentDataForInscription($data);
             // Recherche pour la mère
             $meres = $meresRepository->findBySearchParentDataForInscription($data);
-
-            dump($peres, $meres);
     
             if (!empty($peres) && !empty($meres)) {
                 // Rechercher un parent existant avec le père et la mère
                 $parent = $parentsRepository->findOneByPereAndMere($peres, $meres);
-                dump($parent);
                 if ($parent) {
                     // Rediriger vers la création d'un élève avec l'ID du parent
                     //return $this->redirectToRoute('app_eleves_new', [

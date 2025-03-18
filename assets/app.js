@@ -24,6 +24,7 @@ hljs.highlightAll();
 // Import des styles Sass (optionnel)
 import './styles/app.scss';
 import './scripts/select2.js';
-import './scripts/eleves.js'
+import './scripts/eleves.js';
+import './scripts/checkbox.js'
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

@@ -13,6 +13,8 @@ use App\Entity\Prenoms;
 use App\Entity\Regions;
 use App\Entity\Statuts;
 use App\Entity\Communes;
+use App\Form\SantesType;
+use App\Form\DepartsType;
 use App\Entity\Scolarites1;
 use App\Entity\Scolarites2;
 use Psr\Log\LoggerInterface;
@@ -38,16 +40,21 @@ use App\Repository\Redoublements1Repository;
 use App\Repository\Redoublements2Repository;
 use App\Repository\Redoublements3Repository;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\All;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 use App\EventSubscriber\DateValidationSubscriber;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ElevesType extends AbstractType
@@ -78,7 +85,57 @@ class ElevesType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // Récupérer les rôles de l'utilisateur connecté
+        $userRoles = $this->security->getUser() ? $this->security->getUser()->getRoles() : [];
+
+        // Vérifier si l'utilisateur a le droit de modifier "Admis"
+        $canEditAdmis = in_array('ROLE_ADMIN', $userRoles) || in_array('ROLE_DIRECTION', $userRoles);
+
         $builder
+            ->add('imageFile', VichImageType::class, [
+                'label' => "Photo d'identité",
+                //'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/jpg',
+                            'image/gif',
+                            'image/png',
+                        ]
+                    ])
+                ],
+                'allow_delete' => true,
+                'delete_label' => 'supprimer',
+                'download_uri' => true,
+                'download_label' => 'Télécharger',
+                'image_uri'         => false,
+                'asset_helper' => true,
+            ])
+            ->add('document', FileType::class, [
+                'label' => 'Télécharger Documents (Fichier PDF/Word)',
+                'mapped' => false,
+                'required' => false,
+                'multiple' => true,
+                'constraints' => [
+                    new All([
+                        'constraints' => [
+                            new File([
+                                'maxSize' => '2048k',
+                                'mimeTypes' => [
+                                    'application/pdf',
+                                    'application/x-pdf',
+                                    'application/msword',
+                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                ],
+                                'mimeTypesMessage' => 'Format valid valid PDF ou word',
+                            ])
+                        ]
+                    ]),
+                ]
+            ])
             ->add('sexe', ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => false,
@@ -136,18 +193,26 @@ class ElevesType extends AbstractType
                 ],
                 'error_bubbling' => false,
             ])
-            /*->add('isActif', CheckboxType::class, [
+            ->add('isActif', CheckboxType::class, [
                 'label' => 'Actif(ve)',
                 'required' => false,
             ])
             ->add('isAllowed', CheckboxType::class, [
                 'label' => 'Autorisé(e)',
                 'required' => false,
+                'disabled' => !$options['canEditAdmis'], // ✅ Utilisation de l'option définie
+                'attr' => [
+                    'data-user-roles' => implode(',', $options['userRoles']), // ✅ Utilisation de l'option définie
+                ],
             ])
-            ->add('isAdmin', CheckboxType::class, [
+            ->add('isAdmis', CheckboxType::class, [
                 'label' => 'Admis(e)',
                 'required' => false,
-            ])*/
+                'disabled' => !$options['canEditAdmis'], // ✅ Utilisation de l'option définie
+                'attr' => [
+                    'data-user-roles' => implode(',', $options['userRoles']), // ✅ Utilisation de l'option définie
+                ],
+            ])
             ->add('isHandicap', CheckboxType::class, [
                 'label' => 'Handicapé(e)',
                 'required' => false,
@@ -198,6 +263,22 @@ class ElevesType extends AbstractType
                     'class' => 'select-niveau'
                 ],
             ])
+            ->add('santes', CollectionType::class, [
+                'entry_type' => SantesType::class,
+                'entry_options' => ['label' => false],
+                'by_reference' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'error_bubbling' => false,
+            ])
+            ->add('departs', CollectionType::class, [
+                'entry_type' => DepartsType::class,
+                'entry_options' => ['label' => false],
+                'by_reference' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'error_bubbling' => false,
+            ]);
         ;
 
         // Écouteurs d'événements pour les champs dynamiques
@@ -286,6 +367,11 @@ class ElevesType extends AbstractType
                 }
             }
         );
+
+        // Vérifier si l'utilisateur peut éditer le champ "admis"
+        if (!$options['canEditAdmis']) {
+            $builder->get('admis')->setDisabled(true);
+        }
 
         // Attache l'EventSubscriber pour la validation des dates
         $builder->addEventSubscriber(new DateValidationSubscriber());
@@ -531,9 +617,9 @@ class ElevesType extends AbstractType
         $form->add($builder->getForm());
     }
 
-    public function addRedoublements1Field(FormInterface $form,?Scolarites2 $scolarites2): void
+    public function addRedoublements1Field(FormInterface $form, ?Scolarites2 $scolarites2): void
     {
-        $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1():null;
+        $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1() : null;
         // Récupérez les Redoublements1 depuis le repository
         $redoublements1 = $this->redoublements1Repository->findByScolarites1AndScolarites2($scolarite1, $scolarites2);
 
@@ -551,7 +637,7 @@ class ElevesType extends AbstractType
                 'attr' => [
                     'class' => 'select-redoublement'
                 ],
-                'required' => false,
+                'required' => !empty($redoublements1),
                 'mapped' => false,
                 'error_bubbling' => false,
             ]
@@ -571,8 +657,7 @@ class ElevesType extends AbstractType
 
     public function addRedoublements2Field(FormInterface $form, ?Redoublements1 $redoublements1): void
     {
-            $redoublements2 = $this->redoublements2Repository->findByRedoublement1($redoublements1);
-        //dump($redoublements2);
+        $redoublements2 = $this->redoublements2Repository->findByRedoublement1($redoublements1);
         $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
             'redoublement2',
             EntityType::class,
@@ -582,12 +667,12 @@ class ElevesType extends AbstractType
                 'choice_label' => 'niveau', // Assurez-vous que 'niveau' est une propriété valide de Redoublements1
                 'label' => '2nd Redoub :',
                 'auto_initialize' => false,
-                'choices' => $redoublements2 ? $redoublements2 : [] , // Utilisez les résultats du repository
+                'choices' => $redoublements2 ? $redoublements2 : [], // Utilisez les résultats du repository
                 'placeholder' => $redoublements2 ? '** ** ' : '## ##',
                 'attr' => [
                     'class' => 'select-redoublement'
                 ],
-                'required' => false,
+                'required' => !empty($redoublements2),
                 'mapped' => false,
                 'error_bubbling' => false,
             ]
@@ -609,7 +694,6 @@ class ElevesType extends AbstractType
     {
         // Récupérez les Redoublements1 depuis le repository
         $redoublements3 = $this->redoublements3Repository->findByRedoublement2($redoublements2);
-        dump($redoublements3);
         $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
             'redoublement3',
             EntityType::class,
@@ -619,12 +703,12 @@ class ElevesType extends AbstractType
                 'choice_label' => 'niveau', // Assurez-vous que 'niveau' est une propriété valide de Redoublements1
                 'label' => '3nd Redoub :',
                 'auto_initialize' => false,
-                'choices' => $redoublements3 ? $redoublements3 : [] , // Utilisez les résultats du repository
+                'choices' => $redoublements3 ? $redoublements3 : [], // Utilisez les résultats du repository
                 'placeholder' => $redoublements3 ? '** ** ' : '## ##',
                 'attr' => [
                     'class' => 'select-redoublement'
                 ],
-                'required' => false,
+                'required' => !empty($redoublements3),
                 'mapped' => false,
                 'error_bubbling' => false,
             ]
@@ -694,6 +778,8 @@ class ElevesType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Eleves::class,
+            'canEditAdmis' => false, // ✅ Ajout de l'option par défaut
+            'userRoles' => [], // ✅ Ajout de l'option par défaut
         ]);
     }
 }

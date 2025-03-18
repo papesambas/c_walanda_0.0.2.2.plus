@@ -92,6 +92,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     
     private ?Etablissements $etablissement = null;
 
+    #[ORM\OneToOne(inversedBy: 'users', cascade: ['persist', 'remove'])]
+    private ?Eleves $eleve = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fullname = null;
+
     public function __construct()
     {
         $this->eleves = new ArrayCollection();
@@ -258,6 +264,30 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEtablissement(?Etablissements $etablissement): static
     {
         $this->etablissement = $etablissement;
+
+        return $this;
+    }
+
+    public function getEleve(): ?Eleves
+    {
+        return $this->eleve;
+    }
+
+    public function setEleve(?Eleves $eleve): static
+    {
+        $this->eleve = $eleve;
+
+        return $this;
+    }
+
+    public function getFullname(): ?string
+    {
+        return $this->fullname;
+    }
+
+    public function setFullname(?string $fullname): static
+    {
+        $this->fullname = $fullname;
 
         return $this;
     }
