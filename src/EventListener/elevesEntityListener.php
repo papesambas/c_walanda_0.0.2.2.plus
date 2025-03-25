@@ -33,7 +33,7 @@ class elevesEntityListener
     {
         $this->generateMatricule($eleves);
         $this->setCreatedFields($eleves);
-        $this->createDefaultUsers($eleves);
+        //$this->createDefaultUsers($eleves);
     }
 
     public function preUpdate(Eleves $eleves, LifecycleEventArgs $arg): void
@@ -59,7 +59,7 @@ class elevesEntityListener
         $longueurElementsFixes = strlen($recrutem) + strlen($dateNaissJour) + strlen($dateNaissMois) + strlen($nom) + strlen($prenom) + 2; // +2 pour les séparateurs "-"
     
         // Longueur de la partie aléatoire nécessaire pour atteindre 20 caractères
-        $longueurPartieAleatoire = 30 - $longueurElementsFixes;
+        $longueurPartieAleatoire = 25 - $longueurElementsFixes;
     
         // Caractères autorisés pour la partie aléatoire
         $caracteres = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -127,7 +127,7 @@ class elevesEntityListener
 
     private function createDefaultUsers(Eleves $eleves): void
     {
-        if (null !== $eleves->getUser()) {
+        if (null !== $eleves->getUsers()) {
             return;
         }
 
@@ -144,7 +144,7 @@ class elevesEntityListener
         $user->setUsername($username);
         $user->setEmail($email);
         $user->setRoles($role);
-        $user->setEleves($eleves);
+        //$user->setEleve($eleves);
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);

@@ -3,9 +3,9 @@
 {% block title %}Edit Eleves{% endblock %}
 
 {% block body %}
-    <h1>Edit Eleves</h1>
+<h3 class="mb-2">Edité un élève</h3>
 
-    {{ include('eleves/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('eleves/_form.html.twig', {'button_label': 'Sauvegarder'}) }}
 
     <a href="{{ path('app_eleves_index') }}">back to list</a>
 

@@ -43,12 +43,6 @@ class Niveaux
     private Collection $classes;
 
     /**
-     * @var Collection<int, Statuts>
-     */
-    #[ORM\ManyToMany(targetEntity: Statuts::class, mappedBy: 'niveaux')]
-    private Collection $statuts;
-
-    /**
      * @var Collection<int, Scolarites1>
      */
     #[ORM\OneToMany(targetEntity: Scolarites1::class, mappedBy: 'niveau', orphanRemoval: true)]
@@ -81,16 +75,38 @@ class Niveaux
     #[ORM\OneToMany(targetEntity: Redoublements3::class, mappedBy: 'niveaux')]
     private Collection $redoublements3s;
 
+    #[ORM\Column]
+    #[Assert\NegativeOrZero()]
+    private ?int $minAge = null;
+
+    #[ORM\Column]
+    #[Assert\NegativeOrZero()]
+    private ?int $maxAge = null;
+
+    #[ORM\Column]
+    #[Assert\NegativeOrZero()]
+    private ?int $minDate = null;
+
+    #[ORM\Column]
+    #[Assert\NegativeOrZero()]
+    private ?int $maxDate = null;
+
+    /**
+     * @var Collection<int, Statuts>
+     */
+    #[ORM\OneToMany(targetEntity: Statuts::class, mappedBy: 'niveau')]
+    private Collection $statuts;
+
 
     public function __construct()
     {
         $this->classes = new ArrayCollection();
-        $this->statuts = new ArrayCollection();
         $this->scolarites1s = new ArrayCollection();
         $this->scolarites2s = new ArrayCollection();
         $this->redoublements1s = new ArrayCollection();
         $this->redoublements2s = new ArrayCollection();
         $this->redoublements3s = new ArrayCollection();
+        $this->statuts = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -165,33 +181,6 @@ class Niveaux
             if ($class->getNiveau() === $this) {
                 $class->setNiveau(null);
             }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Statuts>
-     */
-    public function getStatuts(): Collection
-    {
-        return $this->statuts;
-    }
-
-    public function addStatut(Statuts $statut): static
-    {
-        if (!$this->statuts->contains($statut)) {
-            $this->statuts->add($statut);
-            $statut->addNiveau($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStatut(Statuts $statut): static
-    {
-        if ($this->statuts->removeElement($statut)) {
-            $statut->removeNiveau($this);
         }
 
         return $this;
@@ -353,6 +342,84 @@ class Niveaux
             // set the owning side to null (unless already changed)
             if ($redoublements3->getNiveau() === $this) {
                 $redoublements3->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getMinAge(): ?int
+    {
+        return $this->minAge;
+    }
+
+    public function setMinAge(int $minAge): static
+    {
+        $this->minAge = $minAge;
+
+        return $this;
+    }
+
+    public function getMaxAge(): ?int
+    {
+        return $this->maxAge;
+    }
+
+    public function setMaxAge(int $maxAge): static
+    {
+        $this->maxAge = $maxAge;
+
+        return $this;
+    }
+
+    public function getMinDate(): ?int
+    {
+        return $this->minDate;
+    }
+
+    public function setMinDate(int $minDate): static
+    {
+        $this->minDate = $minDate;
+
+        return $this;
+    }
+
+    public function getMaxDate(): ?int
+    {
+        return $this->maxDate;
+    }
+
+    public function setMaxDate(int $maxDate): static
+    {
+        $this->maxDate = $maxDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Statuts>
+     */
+    public function getStatuts(): Collection
+    {
+        return $this->statuts;
+    }
+
+    public function addStatut(Statuts $statut): static
+    {
+        if (!$this->statuts->contains($statut)) {
+            $this->statuts->add($statut);
+            $statut->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStatut(Statuts $statut): static
+    {
+        if ($this->statuts->removeElement($statut)) {
+            // set the owning side to null (unless already changed)
+            if ($statut->getNiveau() === $this) {
+                $statut->setNiveau(null);
             }
         }
 

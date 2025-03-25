@@ -41,6 +41,12 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
 
     public function prePersist(Etablissements $etablissements, LifecycleEventArgs $arg): void
     {
+        $etablissements = $arg->getObject();
+
+        if (!$etablissements instanceof Etablissements) {
+            return;
+        }
+
         $user = $this->security->getUser();
 
         if ($user === null) {
@@ -112,6 +118,12 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
 
     public function preUpdate(Etablissements $etablissements, LifecycleEventArgs $arg): void
     {
+        $etablissements = $arg->getObject();
+
+        if (!$etablissements instanceof Etablissements) {
+            return;
+        }
+
         $user = $this->security->getUser();
         if ($user === null) {
             $etablissements
@@ -132,7 +144,7 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
 
     private function getClassesSlug(Etablissements $etablissements): string
     {
-        $slug = mb_strtolower($etablissements->getDesignation() . '-' . $etablissements->getId() . '-' . time(), 'UTF-8');
+        $slug = mb_strtolower($etablissements->getDesignation() . '-' . time(), 'UTF-8');
         return $this->slugger->slug($slug);
     }
 
@@ -142,55 +154,83 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
             [
                 'nom' => 'Pré Scolaire',
                 'niveaux' => [
-                    ['nom' => 'Petite Section', 'classes' => ['PS1-A', 'PS2-A'], 'scolarites1' => [], 'scolarites2' => []],
-                    ['nom' => 'Moyenne Section', 'classes' => ['MS1-A', 'MS2-A'], 'scolarites1' => [], 'scolarites2' => []],
-                    ['nom' => 'Grande Section', 'classes' => ['GS1-A', 'GS2-A'], 'scolarites1' => [], 'scolarites2' => []],
+                    ['nom' => 'Petite Section', 'minAge' => 4, 'maxAge' => 3, 'minDate' => 1, 'maxDate' => 0, 'classes' => ['PS1-A', 'PS2-A'], 'scolarites1' => [], 'scolarites2' => []],
+                    ['nom' => 'Moyenne Section', 'minAge' => 5, 'maxAge' => 4, 'minDate' => 2, 'maxDate' => 0, 'classes' => ['MS1-A', 'MS2-A'], 'scolarites1' => [], 'scolarites2' => []],
+                    ['nom' => 'Grande Section', 'minAge' => 6, 'maxAge' => 5, 'minDate' => 3, 'maxDate' => 0, 'classes' => ['GS1-A', 'GS2-A'], 'scolarites1' => [], 'scolarites2' => []],
                 ]
             ],
             [
                 'nom' => '1er Cycle',
                 'niveaux' => [
-                    ['nom' => '1ère Année', 'classes' => ['1ère A', '1ère B', '1ère C'], 'scolarites1' => [1, 2, 3], 'scolarites2' => [0]],
-                    ['nom' => '2ème Année', 'classes' => ['2ème A', '2ème B', '2ème C'], 'scolarites1' => [2, 3, 4, 5], 'scolarites2' => [0]],
-                    ['nom' => '3ème Année', 'classes' => ['3ème A', '3ème B', '3ème C'], 'scolarites1' => [3, 4, 5, 6], 'scolarites2' => [0]],
-                    ['nom' => '4ème Année', 'classes' => ['4ème A', '4ème B', '4ème C'], 'scolarites1' => [4, 5, 6, 7], 'scolarites2' => [0]],
-                    ['nom' => '5ème Année', 'classes' => ['5ème A', '5ème B', '5ème C'], 'scolarites1' => [5, 6, 7, 8], 'scolarites2' => [0]],
-                    ['nom' => '6ème Année', 'classes' => ['6ème A', '6ème B', '6ème C'], 'scolarites1' => [6, 7, 8, 9], 'scolarites2' => [0]],
+                    ['nom' => '1ère Année', 'minAge' => 9, 'maxAge' => 5, 'minDate' => 4, 'maxDate' => 0, 'classes' => ['1ère A', '1ère B', '1ère C'], 'scolarites1' => [1, 2, 3], 'scolarites2' => [0]],
+                    ['nom' => '2ème Année', 'minAge' => 10, 'maxAge' => 6, 'minDate' => 5, 'maxDate' => 1, 'classes' => ['2ème A', '2ème B', '2ème C'], 'scolarites1' => [2, 3, 4, 5], 'scolarites2' => [0]],
+                    ['nom' => '3ème Année', 'minAge' => 11, 'maxAge' => 7, 'minDate' => 6, 'maxDate' => 2, 'classes' => ['3ème A', '3ème B', '3ème C'], 'scolarites1' => [3, 4, 5, 6], 'scolarites2' => [0]],
+                    ['nom' => '4ème Année', 'minAge' => 12, 'maxAge' => 8, 'minDate' => 7, 'maxDate' => 3, 'classes' => ['4ème A', '4ème B', '4ème C'], 'scolarites1' => [4, 5, 6, 7], 'scolarites2' => [0]],
+                    ['nom' => '5ème Année', 'minAge' => 13, 'maxAge' => 9, 'minDate' => 8, 'maxDate' => 4, 'classes' => ['5ème A', '5ème B', '5ème C'], 'scolarites1' => [5, 6, 7, 8], 'scolarites2' => [0]],
+                    ['nom' => '6ème Année', 'minAge' => 14, 'maxAge' => 10, 'minDate' => 9, 'maxDate' => 5, 'classes' => ['6ème A', '6ème B', '6ème C'], 'scolarites1' => [6, 7, 8, 9], 'scolarites2' => [0]],
                 ]
             ],
             [
                 'nom' => '2nd Cycle',
                 'niveaux' => [
-                    ['nom' => '7ème Année', 'classes' => ['7ème A', '7ème B', '7ème C'], 'scolarites1' => [6, 7, 8], 'scolarites2' => [1, 2, 3]],
-                    ['nom' => '8ème Année', 'classes' => ['8ème A', '8ème B', '8ème C'], 'scolarites1' => [6, 7, 8], 'scolarites2' => [2, 3, 4, 5]],
-                    ['nom' => '9ème Année', 'classes' => ['9ème A', '9ème B', '9ème C'], 'scolarites1' => [6, 7, 8], 'scolarites2' => [3, 4, 5, 6]],
+                    ['nom' => '7ème Année', 'minAge' => 15, 'maxAge' => 11, 'minDate' => 10, 'maxDate' => 6, 'classes' => ['7ème A', '7ème B', '7ème C'], 'scolarites1' => [6, 7, 8], 'scolarites2' => [1, 2, 3]],
+                    ['nom' => '8ème Année', 'minAge' => 16, 'maxAge' => 12, 'minDate' => 11, 'maxDate' => 7, 'classes' => ['8ème A', '8ème B', '8ème C'], 'scolarites1' => [6, 7, 8], 'scolarites2' => [2, 3, 4, 5]],
+                    ['nom' => '9ème Année', 'minAge' => 17, 'maxAge' => 13, 'minDate' => 12, 'maxDate' => 8, 'classes' => ['9ème A', '9ème B', '9ème C'], 'scolarites1' => [6, 7, 8], 'scolarites2' => [3, 4, 5, 6]],
                 ]
             ]
         ];
 
-        $statuts = $this->initializeStatuts();
+        // **Définition des statuts spécifiques par niveau**
+        $statutsParNiveau = [
+            'Petite Section' => ['1ère Inscription', 'Passant', 'Sans Dossier', 'Abandon'],
+            'Moyenne Section' => ['1ère Inscription', 'Passant', 'Sans Dossier', 'Abandon'],
+            'Grande Section' => ['1ère Inscription', 'Passant', 'Sans Dossier', 'Abandon'],
+            '1ère Année' => ['1ère Inscription', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Exclus', 'Abandon'],
+            '2ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Exclus', 'Abandon'],
+            '3ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Exclus', 'Abandon'],
+            '4ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Exclus', 'Abandon'],
+            '5ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Exclus', 'Abandon'],
+            '6ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Candidat Libre', 'Passe au C.E.P.', 'Exclus', 'Abandon'],
+            '7ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Exclus', 'Abandon'],
+            '8ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Exclus', 'Abandon'],
+            '9ème Année' => ['Transfert Arrivé', 'Passant', 'Redoublant', 'Sans Dossier', 'Transfert Départ', 'Candidat Libre', 'Passe au D.E.F.', 'Exclus', 'Abandon'],
+        ];
 
         foreach ($cyclesConfig as $cycleData) {
             $cycle = new Cycles();
             $cycle->setDesignation($cycleData['nom'])
-                  ->setEtablissement($etablissements);
-        
+                ->setEtablissement($etablissements);
+
             $this->entityManager->persist($cycle);
-        
+
             foreach ($cycleData['niveaux'] as $niveauData) {
                 $niveau = new Niveaux();
                 $niveau->setDesignation($niveauData['nom'])
-                       ->setCycle($cycle);
-        
+                    ->setMaxAge($niveauData['maxAge'])
+                    ->setMinAge($niveauData['minAge'])
+                    ->setMaxDate($niveauData['maxDate'])
+                    ->setMinDate($niveauData['minDate'])
+                    ->setCycle($cycle);
                 $this->entityManager->persist($niveau);
-        
+
+                // **Ajout des statuts spécifiques à ce niveau**
+                if (isset($statutsParNiveau[$niveauData['nom']])) {
+                    foreach ($statutsParNiveau[$niveauData['nom']] as $nomStatut) {
+                        $statut = new Statuts();
+                        $statut->setDesignation($nomStatut);
+                        $statut->setNiveau($niveau);
+                        $this->entityManager->persist($statut);
+                    }
+                }
+
+
                 // Créer et associer Scolarites1
                 foreach ($niveauData['scolarites1'] as $scolarite1Value) {
                     $scolarites1 = new Scolarites1();
                     $scolarites1->setScolarite((string) $scolarite1Value)
-                                ->setNiveau($niveau);
+                        ->setNiveau($niveau);
                     $this->entityManager->persist($scolarites1);
-        
+
                     // Déterminer les Scolarites2 en fonction de Scolarites1 et du niveau
                     $scolarites2Values = [];
                     if ($cycleData['nom'] === '2nd Cycle') {
@@ -198,26 +238,24 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
                     } else {
                         $scolarites2Values = $niveauData['scolarites2']; // Utiliser les valeurs par défaut pour les autres cycles
                     }
-        
+
                     // Créer et associer Scolarites2
                     foreach ($scolarites2Values as $scolarite2Value) {
                         $scolarites2 = new Scolarites2();
                         $scolarites2->setScolarite((string) $scolarite2Value)
-                                     ->setScolarite1($scolarites1)
-                                     ->setNiveau($niveau);
+                            ->setScolarite1($scolarites1)
+                            ->setNiveau($niveau);
                         $this->entityManager->persist($scolarites2);
                     }
                 }
-        
-                $this->attachStatutsToNiveau($niveau, $niveauData['nom'], $statuts);
-        
+
                 foreach ($niveauData['classes'] as $classeNom) {
                     $classe = new Classes();
                     $classe->setDesignation($classeNom)
-                           ->setNiveau($niveau)
-                           ->setCapacite(45)
-                           ->setEffectif(0);
-        
+                        ->setNiveau($niveau)
+                        ->setCapacite(45)
+                        ->setEffectif(0);
+
                     $this->entityManager->persist($classe);
                 }
             }
@@ -353,5 +391,4 @@ class etablissementsEntityListener // Renommez la classe en PascalCase
                 break;
         }
     }
-
 }

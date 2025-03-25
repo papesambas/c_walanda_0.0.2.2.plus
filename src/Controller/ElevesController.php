@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\Users;
 use App\Entity\Eleves;
 use App\Form\ElevesType;
+use Psr\Log\LoggerInterface;
 use App\Entity\DossierEleves;
 use App\Repository\ElevesRepository;
 use App\Repository\CerclesRepository;
 use App\Repository\ClassesRepository;
-use App\Repository\NiveauxRepository;
 use App\Repository\ParentsRepository;
 use App\Repository\StatutsRepository;
 use App\Service\RoleHierarchyService;
@@ -17,7 +17,6 @@ use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Scolarites1Repository;
 use App\Repository\Scolarites2Repository;
-use App\Service\DateConfigurationService;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Repository\LieuNaissancesRepository;
 use App\Repository\Redoublements1Repository;
@@ -35,10 +34,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[Route('/eleves')]
 final class ElevesController extends AbstractController
 {
-    public function __construct(private Security $security)
+    public function __construct(private Security $security, private LoggerInterface $logger)
     {
         $this->security = $security;
     }
+
     #[Route(name: 'app_eleves_index', methods: ['GET'])]
     public function index(ElevesRepository $elevesRepository): Response
     {
@@ -58,7 +58,6 @@ final class ElevesController extends AbstractController
         UserPasswordHasherInterface $PasswordHasher,
     ): Response {
         $elefe = new Eleves();
-
         $user = $this->security->getUser();
         if (!$user) {
             $this->addFlash('error', 'Vous devez être connecté');
@@ -66,9 +65,7 @@ final class ElevesController extends AbstractController
         }
 
         // Récupération des rôles hérités de l'utilisateur
-        $allUserRoles = $roleHierarchyService->getUserRolesWithHierarchy($roleHierarchy, $user);
-        dump($allUserRoles); // Vérifie dans la barre de debug si les rôles sont bien récupérés
-
+        //$allUserRoles = $roleHierarchyService->getUserRolesWithHierarchy($roleHierarchy, $user);
 
         // Vérifier si un parent est passé en paramètre
         if (!$request->query->has('parent_id')) {
@@ -85,10 +82,7 @@ final class ElevesController extends AbstractController
             return $this->redirectToRoute('app_parents_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        $form = $this->createForm(ElevesType::class, $elefe, [
-            'canEditAdmis' => in_array('ROLE_ADMIN', $allUserRoles) || in_array('ROLE_DIRECTION', $allUserRoles),
-            'userRoles' => $allUserRoles, // ✅ Passer les rôles hérités au formulaire
-        ]);
+        $form = $this->createForm(ElevesType::class, $elefe);
         $form->handleRequest($request);
         //dd($request->request->all());
 
@@ -134,19 +128,19 @@ final class ElevesController extends AbstractController
                 $entityManager->persist($user);
                 $entityManager->flush();
 
-                $elefe->setUser($user);
+                $elefe->setUsers($user);
                 $user->setEleve($elefe);
 
-                //$entityManager->persist($elefe);
-                //$entityManager->flush();
+                $entityManager->persist($elefe);
+                $entityManager->flush();
 
                 $this->addFlash('success', 'L\'élève a été créé avec succès.');
-                //return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
             } catch (\Exception $e) {
                 // Journalisation de l'erreur
                 $this->addFlash('error', 'Une erreur s\'est produite lors de l\'enregistrement des modifications.');
                 // Vous pouvez également logger l'erreur pour un débogage ultérieur
-                // $this->logger->error('Erreur lors de la modification de l\'élève : ' . $e->getMessage());
+                $this->logger->error('Erreur lors de la modification de l\'élève : ' . $e->getMessage());
             }
         }
 
@@ -169,13 +163,23 @@ final class ElevesController extends AbstractController
         Request $request,
         Eleves $elefe,
         EntityManagerInterface $entityManager,
+        ParentsRepository $parentsRepository,
+        RoleHierarchyService $roleHierarchyService,
+        RoleHierarchyInterface $roleHierarchy,
         SluggerInterface $slugger,
-        UserPasswordHasherInterface $PasswordHasher,
-
+        UserPasswordHasherInterface $PasswordHasher
     ): Response {
+        $user = $this->security->getUser();
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté');
+            return $this->redirectToRoute('app_login', [], Response::HTTP_SEE_OTHER);
+        }
+
+        // Récupération des rôles hérités de l'utilisateur
+        //$allUserRoles = $roleHierarchyService->getUserRolesWithHierarchy($roleHierarchy, $user);
+
         $form = $this->createForm(ElevesType::class, $elefe);
         $form->handleRequest($request);
-
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
@@ -200,7 +204,7 @@ final class ElevesController extends AbstractController
                     $elefe->addDossierElefe($docum);
                 }
 
-                $user = $elefe->getUser();
+                $user = $elefe->getUsers();
                 if (!$user) {
                     $suffix = substr(time(), -4);
 
@@ -221,7 +225,7 @@ final class ElevesController extends AbstractController
                     $entityManager->persist($user);
                     $entityManager->flush();
 
-                    $elefe->setUser($user);
+                    $elefe->setUsers($user);
                     $user->setEleve($elefe);
                 }
 
@@ -242,6 +246,7 @@ final class ElevesController extends AbstractController
         ]);
     }
 
+
     #[Route('/{id}', name: 'app_eleves_delete', methods: ['POST'])]
     public function delete(Request $request, Eleves $elefe, EntityManagerInterface $entityManager): Response
     {
@@ -253,6 +258,27 @@ final class ElevesController extends AbstractController
         return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/delete/document/{id}', name: 'app_eleve_documents_delete', methods: ['DELETE'])]
+    public function deleteDocument(Request $request, DossierEleves $document, EntityManagerInterface $entityManager)
+    {
+        $data = json_decode($request->getContent(), true);
+        //On vérifie si le token est valide
+        if ($this->isCsrfTokenValid('delete' . $document->getId(), $data['_token'])) {
+            //On récupère le nom du document
+            $designation = $document->getDesignation();
+            //On supprime de la base
+            $entityManager->remove($document);
+            $entityManager->flush();
+
+            //On supprime le fichier
+            unlink($this->getParameter('documents_eleves_directory') . '/' . $designation);
+
+            // On repond en json
+            return new JsonResponse(['success' => 1]);
+        } else {
+            return new JsonResponse(['error' => "Token Invalide"], 400);
+        }
+    }
 
     #[Route('/cercles-by-region/{regionId}', name: 'cercles_by_region')]
     public function getCerclesByRegion(int $regionId, CerclesRepository $cerclesRepository): Response
@@ -264,6 +290,7 @@ final class ElevesController extends AbstractController
         }
         return new Response($html);
     }
+
 
     #[Route('/communes-by-cercle/{cercleId}', name: 'communes_by_cercle')]
     public function getCommunesByCercle(int $cercleId, CommunesRepository $communesRepository): Response
@@ -332,54 +359,53 @@ final class ElevesController extends AbstractController
     }
 
     #[Route('/redoublement1-by-scolarite2/{scolarite2Id}', name: 'redoublement1_by_scolarite2')]
-    public function getRedoublement1ByScolarite2(int $scolarite2Id, Scolarites2Repository $scolarites2Repository, Redoublements1Repository $redoublements1Repository): Response
+    public function getRedoublement1ByScolarite2(int $scolarite2Id, Scolarites2Repository $scolarites2Repository, Redoublements1Repository $redoublements1Repository): JsonResponse
     {
         $scolarites2 = $scolarites2Repository->findOneBy(['id' => $scolarite2Id]);
         $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1() : null;
         $redoublements1 = $redoublements1Repository->findByScolarites1AndScolarites2($scolarite1, $scolarites2);
+
         $html = '<option value="">Choisir un redoublement</option>';
         foreach ($redoublements1 as $redoublement1) {
             $html .= '<option value="' . $redoublement1->getId() . '">' . $redoublement1->getNiveau() . '</option>';
         }
-        return new Response($html);
+
+        // Retourner une réponse JSON avec deux informations
+        return new JsonResponse([
+            'html' => $html,
+            'has_redoublements' => !empty($redoublements1)
+        ]);
     }
 
     #[Route('/redoublement2-by-redoublement1/{redoublement1Id}', name: 'redoublement2_by_redoublement1')]
-    public function getRedoublement2ByRedoublement1(int $redoublement1Id, Redoublements2Repository $redoublements2Repository): Response
+    public function getRedoublement2ByRedoublement1(int $redoublement1Id, Redoublements2Repository $redoublements2Repository): JsonResponse
     {
         $redoublements2 = $redoublements2Repository->findBy(['redoublement1' => $redoublement1Id]);
+
         $html = '<option value="">Choisir un redoublement</option>';
         foreach ($redoublements2 as $redoublement2) {
             $html .= '<option value="' . $redoublement2->getId() . '">' . $redoublement2->getNiveau() . '</option>';
         }
-        return new Response($html);
+
+        return new JsonResponse([
+            'html' => $html,
+            'has_redoublement2s' => !empty($redoublements2)
+        ]);
     }
 
     #[Route('/redoublement3-by-redoublement2/{redoublement2Id}', name: 'redoublement3_by_redoublement2')]
-    public function getRedoublement3ByRedoublement2(int $redoublement2Id, Redoublements3Repository $redoublements3Repository): Response
+    public function getRedoublement3ByRedoublement2(int $redoublement2Id, Redoublements3Repository $redoublements3Repository): JsonResponse
     {
         $redoublements3 = $redoublements3Repository->findBy(['redoublement2' => $redoublement2Id]);
+
         $html = '<option value="">Choisir un redoublement</option>';
         foreach ($redoublements3 as $redoublement3) {
             $html .= '<option value="' . $redoublement3->getId() . '">' . $redoublement3->getNiveau() . '</option>';
         }
-        return new Response($html);
+
+        return new JsonResponse([
+            'html' => $html,
+            'has_redoublement3s' => !empty($redoublements3)
+        ]);
     }
-
-
-
-    /*#[Route('/dates-by-niveau/{id}', name: 'eleves_dates_by_niveau', methods: ['GET'])]
-    public function getDatesByNiveau(NiveauxRepository $niveauxRepository, int $id, DateConfigurationService $dateService): JsonResponse
-    {
-        $niveaux = $niveauxRepository->find($id);
-
-        if (!$niveaux) {
-            return new JsonResponse(['error' => 'Niveau non trouvé'], 404);
-        }
-
-        $designation = $niveaux->getDesignation();
-        $configurations = $dateService->getDateConfigurations();
-
-        return new JsonResponse($configurations[$designation] ?? []);
-    }*/
 }

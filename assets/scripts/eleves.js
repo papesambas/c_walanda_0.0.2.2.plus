@@ -122,58 +122,200 @@ $(document).ready(function () {
     //Gérer le chargement de redoublement1
     $('#eleves_scolarite2').change(function () {
         let scolarite2Id = $(this).val();
+        let $redoublement1 = $('#eleves_redoublement1');
+        let $redoublement2 = $('#eleves_redoublement2');
+        let $redoublement3 = $('#eleves_redoublement3');
+
+        $redoublement1.prop('required', false);
+        $redoublement1.addClass('required-field');
+        $redoublement2.prop('required', false);
+        $redoublement2.removeClass('required-field');
+        $redoublement3.prop('required', false);
+        $redoublement3.removeClass('required-field');
+
         if (scolarite2Id) {
             $.ajax({
                 url: '/eleves/redoublement1-by-scolarite2/' + scolarite2Id,
                 type: 'GET',
+                dataType: 'json', // Important pour interpréter la réponse JSON
                 success: function (data) {
-                    $('#eleves_redoublement1').html(data);
-                    $('#eleves_redoublement2').html('<option value="">Choisir un remboursement</option>');
-                    $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
-        
+                    // Mettre à jour les options
+                    $redoublement1.html(data.html);
+
+                    // Gérer l'attribut required
+                    if (data.has_redoublements) {
+                        $redoublement1.prop('required', true);
+                        $redoublement1.addClass('required-field');
+                    } else {
+                        $redoublement1.prop('required', false);
+                        $redoublement1.removeClass('required-field');
+                    }
+
+                    // Réinitialiser les champs suivants
+                    $('#eleves_redoublement2, #eleves_redoublement3').html(
+                        '<option value="">Choisir un redoublement</option>'
+                    );
                 }
             });
         } else {
-            $('#eleves_redoublement1').html('<option value="">Choisir un remboursement</option>');
-            $('#eleves_redoublement2').html('<option value="">Choisir un remboursement</option>');
-            $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+            // Réinitialiser tous les champs
+            $redoublement1.html('<option value="">Choisir un redoublement</option>')
+                .prop('required', false)
+                .removeClass('required-field');
 
+            $('#eleves_redoublement2, #eleves_redoublement3').html(
+                '<option value="">Choisir un redoublement</option>'
+            );
         }
     });
 
     //Gérer le chargement de redoublement2
     $('#eleves_redoublement1').change(function () {
         let redoublement1Id = $(this).val();
+        let $redoublement2 = $('#eleves_redoublement2');
+        $redoublement2.prop('required', false);
+        $redoublement2.removeClass('required-field');
+
         if (redoublement1Id) {
             $.ajax({
                 url: '/eleves/redoublement2-by-redoublement1/' + redoublement1Id,
                 type: 'GET',
+                dataType: 'json',
                 success: function (data) {
-                    $('#eleves_redoublement2').html(data);
-                    $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+                    // Mettre à jour les options
+                    $redoublement2.html(data.html);
+
+                    // Gérer l'attribut required
+                    if (data.has_redoublement2s) {
+                        $redoublement2.prop('required', true);
+                        $redoublement2.addClass('required-field');
+                    } else {
+                        $redoublement2.prop('required', false);
+                        $redoublement2.removeClass('required-field');
+                    }
+
+                    // Réinitialiser le champ suivant
+                    $('#eleves_redoublement3').html('<option value="">Choisir un redoublement</option>');
                 }
             });
         } else {
-            $('#eleves_redoublement2').html('<option value="">Choisir un remboursement</option>');
-            $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+            // Réinitialiser les champs suivants
+            $redoublement2.html('<option value="">Choisir un redoublement</option>')
+                .prop('required', false)
+                .removeClass('required-field');
+
+            $('#eleves_redoublement3').html('<option value="">Choisir un redoublement</option>');
         }
     });
 
     //Gérer le chargement de redoublement3
     $('#eleves_redoublement2').change(function () {
         let redoublement2Id = $(this).val();
+        let $redoublement3 = $('#eleves_redoublement3');
+        $redoublement3.prop('required', false);
+        $redoublement3.removeClass('required-field');
+
         if (redoublement2Id) {
             $.ajax({
                 url: '/eleves/redoublement3-by-redoublement2/' + redoublement2Id,
                 type: 'GET',
+                dataType: 'json',
                 success: function (data) {
-                    $('#eleves_redoublement3').html(data);
+                    $redoublement3.html(data.html);
+
+                    if (data.has_redoublement3s) {
+                        $redoublement3.prop('required', true);
+                        $redoublement3.addClass('required-field');
+                    } else {
+                        $redoublement3.prop('required', false);
+                        $redoublement3.removeClass('required-field');
+                    }
                 }
             });
         } else {
-            $('#eleves_redoublement3').html('<option value="">Choisir un remboursement</option>');
+            $redoublement3.html('<option value="">Choisir un redoublement</option>')
+                .prop('required', false)
+                .removeClass('required-field');
         }
     });
 
+    document.getElementById('eleves_dateNaissance').addEventListener('change', function() {
+        const input = this;
+        
+        // Récupération des paramètres
+        const minDate = new Date(input.min);
+        const maxDate = new Date(input.max);
+        const selectedDate = new Date(input.value);
+        
+        // Validation de base (HTML5)
+        if (selectedDate < minDate || selectedDate > maxDate) {
+            input.setCustomValidity(`La date doit être entre ${minDate.toLocaleDateString()} et ${maxDate.toLocaleDateString()}`);
+            input.classList.add('is-invalid');
+        } else {
+            input.setCustomValidity('');
+            input.classList.remove('is-invalid');
+        }
+        
+        input.reportValidity();
+    });
 
+    document.getElementById('eleves_dateExtrait').addEventListener('change', function() {
+        const input = this;
+        
+        // Récupération des paramètres
+        const minDate = new Date(input.min);
+        const maxDate = new Date(input.max);
+        const selectedDate = new Date(input.value);
+        
+        // Validation de base (HTML5)
+        if (selectedDate < minDate || selectedDate > maxDate) {
+            input.setCustomValidity(`La date doit être entre ${minDate.toLocaleDateString()} et ${maxDate.toLocaleDateString()}`);
+            input.classList.add('is-invalid');
+        } else {
+            input.setCustomValidity('');
+            input.classList.remove('is-invalid');
+        }
+        
+        input.reportValidity();
+    });
+
+    document.getElementById('eleves_dateRecrutement').addEventListener('change', function() {
+        const input = this;
+        
+        // Récupération des paramètres
+        const minDate = new Date(input.min);
+        const maxDate = new Date(input.max);
+        const selectedDate = new Date(input.value);
+        
+        // Validation de base (HTML5)
+        if (selectedDate < minDate || selectedDate > maxDate) {
+            input.setCustomValidity(`La date doit être entre ${minDate.toLocaleDateString()} et ${maxDate.toLocaleDateString()}`);
+            input.classList.add('is-invalid');
+        } else {
+            input.setCustomValidity('');
+            input.classList.remove('is-invalid');
+        }
+        
+        input.reportValidity();
+    });
+
+    document.getElementById('eleves_dateInscription').addEventListener('change', function() {
+        const input = this;
+        
+        // Récupération des paramètres
+        const minDate = new Date(input.min);
+        const maxDate = new Date(input.max);
+        const selectedDate = new Date(input.value);
+        
+        // Validation de base (HTML5)
+        if (selectedDate < minDate || selectedDate > maxDate) {
+            input.setCustomValidity(`La date doit être entre ${minDate.toLocaleDateString()} et ${maxDate.toLocaleDateString()}`);
+            input.classList.add('is-invalid');
+        } else {
+            input.setCustomValidity('');
+            input.classList.remove('is-invalid');
+        }
+        
+        input.reportValidity();
+    });
 });

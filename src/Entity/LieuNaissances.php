@@ -26,7 +26,7 @@ class LieuNaissances
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'lieuNaissances', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',onDelete:"CASCADE")]
     private ?Communes $commune = null;
 
     /**

@@ -12,6 +12,10 @@
                 <td>{{ elefe.id }}</td>
             </tr>
             <tr>
+                <th>ImageName</th>
+                <td>{{ elefe.imageName }}</td>
+            </tr>
+            <tr>
                 <th>Sexe</th>
                 <td>{{ elefe.sexe }}</td>
             </tr>
@@ -34,6 +38,50 @@
             <tr>
                 <th>NumeroExtrait</th>
                 <td>{{ elefe.numeroExtrait }}</td>
+            </tr>
+            <tr>
+                <th>IsActif</th>
+                <td>{{ elefe.isActif ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>IsAllowed</th>
+                <td>{{ elefe.isAllowed ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>IsAdmis</th>
+                <td>{{ elefe.isAdmis ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>IsHandicap</th>
+                <td>{{ elefe.isHandicap ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>NatureHandicape</th>
+                <td>{{ elefe.natureHandicape }}</td>
+            </tr>
+            <tr>
+                <th>Fullname</th>
+                <td>{{ elefe.fullname }}</td>
+            </tr>
+            <tr>
+                <th>StatutFinance</th>
+                <td>{{ elefe.statutFinance }}</td>
+            </tr>
+            <tr>
+                <th>Matricule</th>
+                <td>{{ elefe.matricule }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ elefe.createdAt ? elefe.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ elefe.updatedAt ? elefe.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ elefe.slug }}</td>
             </tr>
         </tbody>
     </table>

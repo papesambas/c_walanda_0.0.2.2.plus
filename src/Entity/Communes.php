@@ -26,7 +26,7 @@ class Communes
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'communes', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', )]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',onDelete:"CASCADE")]
     private ?Cercles $cercle = null;
 
     /**

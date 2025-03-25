@@ -4,7 +4,9 @@ $(document).ready(function () {
         let inputField = $('#eleves_natureHandicape');
         let checkbox = $('#eleves_isHandicap');
         let message = $('#eleves_natureHandicape');
-
+        inputField.prop('required', false); // Ne pas rendre le champ obligatoire
+ console.log(checkbox.length && message.length);
+ 
         // Vérifier si les éléments existent
         if (checkbox.length && message.length) {
             checkbox.on('change', function () {
@@ -25,9 +27,28 @@ $(document).ready(function () {
     function handleCheckboxLogic() {
         let checkboxActif = $('#eleves_isActif');
         let checkboxAdmis = $('#eleves_isAdmis');
+        let checkboxAllowed = $('#eleves_isAllowed');
+        let departContainer = $('#departs-container');
+        //let checkboxActif = $('#{{ form.isActif.vars.id }}'); // Récupération de l'ID du champ actif
+        //let checkboxAdmis = $('#{{ form.isAdmis.vars.id }}'); // Récupération de l'ID du champ admis
+    
+        function toggleDepartContainer() {
+            if (!checkboxActif.prop('checked') && !checkboxAdmis.prop('checked')) {
+                departContainer.show(); // Afficher le conteneur
+            } else {
+                departContainer.hide(); // Cacher le conteneur
+            }
+        }
+    
+        // Vérifier au chargement initial
+        toggleDepartContainer();
+    
+        // Ajouter un écouteur d'événement sur les cases à cocher
+        checkboxActif.on('change', toggleDepartContainer);
+        checkboxAdmis.on('change', toggleDepartContainer);
 
         // Récupérer les rôles de l'utilisateur depuis l'attribut data
-        let userRoles = checkboxAdmis.data('user-roles') ? checkboxAdmis.data('user-roles').split(',') : [];
+        /*let userRoles = checkboxAdmis.data('user-roles') ? checkboxAdmis.data('user-roles').split(',') : [];
 
         // Vérifier si l'utilisateur a les droits nécessaires
         let isAuthorized = userRoles.includes('ROLE_ADMIN') || userRoles.includes('ROLE_DIRECTION');
@@ -38,20 +59,24 @@ $(document).ready(function () {
         // Désactiver la case "Admis" si l'utilisateur n'est pas autorisé
         if (!isAuthorized) {
             checkboxAdmis.prop('disabled', true);
-        }
+            checkboxAllowed.prop('disabled', true);
+        }*/
 
         // Désactiver "Actif" si "Admis" n'est pas coché
         checkboxActif.prop('disabled', !checkboxAdmis.prop('checked'));
+        checkboxAllowed.prop('disabled', !checkboxActif.prop('checked')).prop('checked', false);
 
         // Si "Actif" est coché alors que "admis" ne l'est pas, décocher "Actif"
         if (checkboxActif.prop('checked') && !checkboxAdmis.prop('checked')) {
             checkboxActif.prop('checked', false);
+            checkboxAllowed.prop('checked', false);
             alert("Vous devez d'abord cocher 'Admis' pour pouvoir cocher 'Actif'.");
         }
 
-        if (checkboxAdmis.prop('checked') && checkboxActif.prop('checked')) {
+
+        /*if (checkboxAdmis.prop('checked') && checkboxActif.prop('checked')) {
             // Log des états des cases
-            /*$.ajax({
+            $.ajax({
                 url: '/frais/scolarites/new',
                 method: 'GET',
                 success: function (response) {
@@ -60,8 +85,8 @@ $(document).ready(function () {
                 error: function (error) {
                     console.error('Erreur AJAX :', error);
                 }
-            });*/
-        }
+            });
+        }*/
     }
 
     // Appliquer la logique au chargement de la page

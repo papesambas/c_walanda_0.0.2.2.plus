@@ -163,3 +163,7 @@ form button:hover {
 .pagination li a:hover {
     background-color: #0056b3;
 }
+
+.required-field {
+    border-left: 3px solid #ff0000; /* Indication visuelle */
+}

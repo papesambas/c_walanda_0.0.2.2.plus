@@ -1,113 +1,255 @@
-{# templates/eleves/new.html.twig #}
-
 {% block body %}
-<div >
-    <h3 class="mb-4">Ajouter un élève</h3>
-
-    {# Afficher le formulaire #}
+<div class="container-fluid mt-3">
     {{ form_start(form) }}
     {{ form_errors(form) }}
-    <div class="row">
-        <div class="col-2">
-            {{ form_row(form.imageFile) }}
+
+    {# Section Principale - Photo + Infos Personnelles #}
+    <div class="row g-1 mb-4">
+        {# Colonne Photo #}
+        <div class="col-md-2">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    {% if app.request.attributes.get('_route') == 'app_eleves_edit' and elefe.imageName %}
+                    <img class="img-fluid rounded mb-2"
+                        src="{{ vich_uploader_asset(elefe, 'imageFile') | imagine_filter('photo_identite') }}" />
+                    {{ form_widget(form.imageFile, {attr: {class: 'form-control-sm'}}) }}
+                    {% if form.delete is defined %}
+                    <div class="mt-2">
+                        {{ form_row(form.delete, {label: 'Supprimer la photo', attr: {class: 'btn-sm'}}) }}
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    {{ form_row(form.imageFile, {label: "Photo d'identité", attr: {class: 'form-control-sm'}}) }}
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="col-md-5">
-            {# Section Informations personnelles #}
-            <div class="card mb-4">
+
+        {# Colonne Infos Personnelles #}
+        <div class="col-md-10">
+            <div class="card">
                 <div class="card-header bg-primary text-white">
-                    Informations personnelles
+                    <i class="fas fa-user-circle me-2"></i>Informations personnelles
                 </div>
                 <div class="card-body">
-                   {# {{ form_row(form.imageFile) }} #}
-                    {{ form_row(form.nom) }}
-                    {{ form_row(form.prenom) }}
-                    {{ form_row(form.sexe) }}
-                    <div class="row">
-                        <div class="col-6">{{ form_row(form.dateNaissance) }}</div>
-                        <div class="col-6">{{ form_row(form.dateExtrait) }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">{{ form_row(form.numeroExtrait) }}</div>
-                        {#<div class="col-4 mt-4">{{ form_label(form.isHandicap) }}</div>#}
-                        <div class="col-2 mt-5">{{ form_widget(form.isHandicap) }}</div>
-                    </div>
-                 {{ form_row(form.natureHandicape) }}
-                </div>
-            </div>
-        </div>
+                    <div class="row g-2">
+                        <div class="col-md-4">{{ form_row(form.nom) }}</div>
+                        <div class="col-md-4">{{ form_row(form.prenom) }}</div>
+                        <div class="col-md-4">{{ form_row(form.sexe) }}</div>
 
-        <div class="col-md-5">
-            {# Section Informations scolaires #}
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    Informations scolaires
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">{{ form_row(form.niveau) }}</div>
-                        <div class="col-6">{{ form_row(form.classe) }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">{{ form_row(form.dateInscription) }}</div>
-                        <div class="col-6">{{ form_row(form.dateRecrutement) }}</div>
-                    </div>
-                    {{ form_row(form.statutFinance) }}
-                    <div class="row">
-                        <div class="col-6">{{ form_row(form.scolarite1) }}</div>
-                        <div class="col-6">{{ form_row(form.scolarite2) }}</div>
-                        <div class="col-6">{{ form_row(form.statut) }}</div>
-                        <div class="col-6">{{ form_row(form.redoublement1) }}</div>
-                        <div class="col-6">{{ form_row(form.redoublement2) }}</div>
-                        <div class="col-6">{{ form_row(form.redoublement3) }}</div>
-                    </div>
+                        <div class="col-md-4">{{ form_row(form.dateNaissance) }}</div>
+                        <div class="col-md-4">{{ form_row(form.dateExtrait) }}</div>
+                        <div class="col-md-4">{{ form_row(form.numeroExtrait) }}</div>
 
-                    <div class="row">
-                        <div class="col-4">{{ form_row(form.isActif) }}</div>
-                        <div class="col-4">{{ form_row(form.isAdmis) }}</div>
-                        <div class="col-4">{{ form_row(form.isAllowed) }}</div>
+                        <div class="col-md-3">
+                            <div class="form-check form-switch mt-3">
+                                {{ form_widget(form.isHandicap) }}
+                                {{ form_label(form.isHandicap) }}
+                            </div>
+                        </div>
+                        <div class="col-md-9">{{ form_row(form.natureHandicape) }}</div>
+
+                        <div class="card-header bg-success text-white">
+                            <i class="fas fa-user-circle me-2"></i>Lieu de Naissance
+                        </div>
+
+                        <div class="col-md-4">{{ form_row(form.region) }}</div>
+                        <div class="col-md-4">{{ form_row(form.cercle) }}</div>
+                        <div class="col-md-4">{{ form_row(form.commune) }}</div>
+                        <div class="col-md-4">{{ form_row(form.lieuNaissance) }}</div>
+
                     </div>
-                    
-                    
                 </div>
             </div>
         </div>
     </div>
 
-    {# Section Lieu de naissance #}
+    {# Section Informations Scolaires #}
     <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-            Lieu de naissance
+        <div class="card-header bg-success text-white">
+            <i class="fas fa-graduation-cap me-2"></i>Informations scolaires
         </div>
         <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-2">{{ form_row(form.niveau) }}</div>
+                <div class="col-md-2">{{ form_row(form.classe) }}</div>
+                <div class="col-md-3">{{ form_row(form.statut) }}</div>
+                <div class="col-md-5">{{ form_row(form.ecoleRecrutement) }}</div>
+                <div class="col-md-3">{{ form_row(form.dateInscription) }}</div>
+                <div class="col-md-3">{{ form_row(form.dateRecrutement) }}</div>
+
+                <div class="col-md-5">{{ form_row(form.statutFinance) }}</div>
+
+                <div class="col-md-2">
+                    <div class="form-check form-switch mt-3">
+                        {{ form_widget(form.isActif) }}
+                        {{ form_label(form.isActif) }}
+                    </div>
+                </div>
+                {% if form.isAdmis is defined %}
+                <div class="col-md-2">
+                    <div class="form-check form-switch mt-3">
+                        {{ form_widget(form.isAllowed) }}
+                        {{ form_label(form.isAllowed) }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if form.isAdmis is defined %}
+                <div class="col-md-2">
+                    <div class="form-check form-switch mt-3">
+                        {{ form_widget(form.isAdmis) }}
+                        {{ form_label(form.isAdmis) }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="col-md-2">{{ form_row(form.scolarite1) }}</div>
+                <div class="col-md-2">{{ form_row(form.scolarite2) }}</div>
+                <div class="col-md-4">{{ form_row(form.redoublement1) }}</div>
+
+                <div class="col-md-4">{{ form_row(form.redoublement2) }}</div>
+                <div class="col-md-4">{{ form_row(form.redoublement3) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <i class="fas fa-graduation-cap me-2"></i>Documents Scolaires
+        </div>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="row mt-3 mx-auto border rounded ">
+                    {% if app.request.attributes.get('_route')== 'app_eleves_edit' %}
+                    <div class="row mx-auto bg-success bg-opacity-10 mb-2">
+                        <div class="col-2 pt-2">
+                            <h6 class="fst-italic text-center text-primary-emphasis">Documents fournis</h6>
+                        </div>
+                        <div class="col-10 pt-2">
+                            {% if elefe.dossierEleves %}
+                            <div class="row">
+                                {% for document in elefe.dossierEleves %}
+                                <div class="col-auto mt-1">
+                                    <div class="row">
+                                        <div class="fst-italic">
+                                            <a
+                                                href="{{ asset('uploads/eleves/documents/' ~ document.designation) }}">{{ document.designation }}(PDF)</a>
+                                            <a class="text-danger fst-italic"
+                                                href="{{ path('app_eleve_documents_delete', {'id': document.id}) }}"
+                                                data-delete="data-delete"
+                                                data-token="{{ csrf_token('delete' ~ document.id) }}">supprimer</a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {{ form_widget(form.document) }}
+                                {% if form.delete is defined %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        {{ form_row(form.delete) }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            {{ form_widget(form.document) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    {{ form_widget(form.document) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {# Sections en 2 colonnes #}
+    <div class="row g-4">
+        {# Colonne de gauche #}
+        <div class="col-lg-12">
+            {# Ecole fréquentée #}
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-school me-2"></i>École fréquentée l'an dernier
+                </div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-warning btn-sm btn-new w-100" data-collection="#provenances">
+                        <span class="fst-italic text-center">L'enfant a t-il fréquenté d'autres établissements ?</span>
+                    </button>
+                    <div id="provenances" class="row" data-prototype="{{ include("eleves/_provenances.html.twig", {form: form.ecoleAnDernier.vars.prototype})|e ('html_attr') }}" data-index="{{ form.ecoleAnDernier|length > 0 ? form.ecoleAnDernier|last.vars.name + 1 : 0 }}">
+                        {% for ecoleAnDernierForm in form.ecoleAnDernier %}
+                            <div class="col-12">
+                                {{ include("eleves/_provenances.html.twig", {form: ecoleAnDernierForm}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Colonne de droite #}
+        <div class="col-lg-12">
             <div class="row">
-                <div class="col-md-4">
-                    {{ form_row(form.region) }}
+                <div class="col-6">
+                    {# Etat de santé #}
+                    <div class="card h-100 mb-3">
+                        <div class="card-header bg-info text-white">
+                            <i class="fas fa-heartbeat me-2"></i>État de santé
+                        </div>
+                        <div class="card-body">
+                            <button type="button" class="btn btn-warning btn-sm btn-new w-100" data-collection="#santes">
+                                <span class="fst-italic text-center">L'enfant a t-il des problèmes de Santé ?</span>
+                            </button>
+                            <div id="santes" class="row" data-prototype="{{ include("eleves/_santes.html.twig", {form: form.santes.vars.prototype})|e ('html_attr') }}" data-index="{{ form.santes|length > 0 ? form.santes|last.vars.name + 1 : 0 }}">
+                                {% for santeForm in form.santes %}
+                                    <div class="col-12">
+                                        {{ include("eleves/_santes.html.twig", {form: santeForm}) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+        
                 </div>
-                <div class="col-md-4">
-                    {{ form_row(form.cercle) }}
-                </div>
-                <div class="col-md-4">
-                    {{ form_row(form.commune) }}
+                <div class="col-6">
+                    {# Départs #}
+                    <div class="card h-100" id="departs-container" {% if form.isActif.vars.checked %}style="display: none;" {%
+                        endif %}>
+                        <div class="card-header bg-info text-white">
+                            <i class="fas fa-sign-out-alt me-2"></i>Constatation d'un départ
+                        </div>
+                        <div class="card-body">
+                            <button type="button" class="btn btn-danger btn-sm btn-new w-100" data-collection="#departs">
+                                <span class="fst-italic text-center">Vous allez constater un transfert ou un abandon ?</span>
+                            </button>
+                            <div id="departs" class="row" data-prototype="{{ include("eleves/_departs.html.twig", {form: form.departs.vars.prototype})|e ('html_attr') }}" data-index="{{ form.departs|length > 0 ? form.departs|last.vars.name + 1 : 0 }}">
+                                {% for departForm in form.departs %}
+                                    <div class="col-12">
+                                        {{ include("eleves/_departs.html.twig", {form: departForm}) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+        
                 </div>
             </div>
-            {{ form_row(form.lieuNaissance) }}
         </div>
     </div>
 
-    {# Section Documents #}
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            Documents
-        </div>
-        <div class="card-body">
-            {{ form_row(form.document) }}
-        </div>
+    {# Boutons de soumission #}
+    <div class="d-flex gap-2 mt-4 w-100">
+        <a href="{{ path('app_eleves_index') }}" class="btn btn-sm btn-outline-warning w-100 d-flex align-items-center justify-content-center">
+            <i class="fas fa-arrow-left me-1"></i> Retour
+        </a>
+        <button type="submit" class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center">
+            <i class="fas fa-save me-1"></i> {{ button_label|default('Enregistrer') }}
+        </button>
     </div>
-
-    {# Bouton de soumission #}
-    <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
-    </button>
-    {{ form_end(form) }}
+        {{ form_end(form) }}
 </div>
 {% endblock %}

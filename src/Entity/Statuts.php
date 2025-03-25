@@ -12,8 +12,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: StatutsRepository::class)]
-#[ORM\Table(name: 'statuts')]
-#[ORM\UniqueConstraint(name: 'UNIQ_STATUT_DESIGNATION', columns: ['designation'])]
 class Statuts
 {
     use SlugTrait;
@@ -26,13 +24,6 @@ class Statuts
     private ?int $id = null;
 
     /**
-     * @var Collection<int, Niveaux>
-     */
-    #[ORM\ManyToMany(targetEntity: Niveaux::class, inversedBy: 'statuts')]
-    //#[ORM\JoinTable(name: 'statuts_niveaux')]
-    private Collection $niveaux;
-
-    /**
      * @var Collection<int, Eleves>
      */
     #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'statut')]
@@ -41,39 +32,18 @@ class Statuts
     #[ORM\Column(length: 50)]
     private ?string $designation = null;
 
+    #[ORM\ManyToOne(inversedBy: 'statuts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Niveaux $niveau = null;
+
     public function __construct()
     {
-        $this->niveaux = new ArrayCollection();
         $this->eleves = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    /**
-     * @return Collection<int, Niveaux>
-     */
-    public function getNiveaux(): Collection
-    {
-        return $this->niveaux;
-    }
-
-    public function addNiveau(Niveaux $niveau): static
-    {
-        if (!$this->niveaux->contains($niveau)) {
-            $this->niveaux->add($niveau);
-        }
-
-        return $this;
-    }
-
-    public function removeNiveau(Niveaux $niveau): static
-    {
-        $this->niveaux->removeElement($niveau);
-
-        return $this;
     }
 
     /**
@@ -114,6 +84,18 @@ class Statuts
     public function setDesignation(string $designation): static
     {
         $this->designation = $designation;
+
+        return $this;
+    }
+
+    public function getNiveau(): ?Niveaux
+    {
+        return $this->niveau;
+    }
+
+    public function setNiveau(?Niveaux $niveau): static
+    {
+        $this->niveau = $niveau;
 
         return $this;
     }

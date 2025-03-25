@@ -9,12 +9,24 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>ImageName</th>
                 <th>Sexe</th>
                 <th>DateInscription</th>
                 <th>DateRecrutement</th>
                 <th>DateNaissance</th>
                 <th>DateExtrait</th>
                 <th>NumeroExtrait</th>
+                <th>IsActif</th>
+                <th>IsAllowed</th>
+                <th>IsAdmis</th>
+                <th>IsHandicap</th>
+                <th>NatureHandicape</th>
+                <th>Fullname</th>
+                <th>StatutFinance</th>
+                <th>Matricule</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -22,12 +34,24 @@
         {% for elefe in eleves %}
             <tr>
                 <td>{{ elefe.id }}</td>
+                <td>{{ elefe.imageName }}</td>
                 <td>{{ elefe.sexe }}</td>
                 <td>{{ elefe.dateInscription ? elefe.dateInscription|date('Y-m-d') : '' }}</td>
                 <td>{{ elefe.dateRecrutement ? elefe.dateRecrutement|date('Y-m-d') : '' }}</td>
                 <td>{{ elefe.dateNaissance ? elefe.dateNaissance|date('Y-m-d') : '' }}</td>
                 <td>{{ elefe.dateExtrait ? elefe.dateExtrait|date('Y-m-d') : '' }}</td>
                 <td>{{ elefe.numeroExtrait }}</td>
+                <td>{{ elefe.isActif ? 'Yes' : 'No' }}</td>
+                <td>{{ elefe.isAllowed ? 'Yes' : 'No' }}</td>
+                <td>{{ elefe.isAdmis ? 'Yes' : 'No' }}</td>
+                <td>{{ elefe.isHandicap ? 'Yes' : 'No' }}</td>
+                <td>{{ elefe.natureHandicape }}</td>
+                <td>{{ elefe.fullname }}</td>
+                <td>{{ elefe.statutFinance }}</td>
+                <td>{{ elefe.matricule }}</td>
+                <td>{{ elefe.createdAt ? elefe.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ elefe.updatedAt ? elefe.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ elefe.slug }}</td>
                 <td>
                     <a href="{{ path('app_eleves_show', {'id': elefe.id}) }}">show</a>
                     <a href="{{ path('app_eleves_edit', {'id': elefe.id}) }}">edit</a>
@@ -35,7 +59,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="8">no records found</td>
+                <td colspan="20">no records found</td>
             </tr>
         {% endfor %}
         </tbody>

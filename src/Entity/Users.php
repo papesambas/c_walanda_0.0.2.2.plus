@@ -81,18 +81,13 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    /**
-     * @var Collection<int, Eleves>
-     */
-    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'user')]
-    private Collection $eleves;
-
     #[ORM\ManyToOne(inversedBy: 'users', fetch: "LAZY")]
     #[ORM\JoinColumn(nullable: true,referencedColumnName: 'id',onDelete:"CASCADE")]
     
     private ?Etablissements $etablissement = null;
 
     #[ORM\OneToOne(inversedBy: 'users', cascade: ['persist', 'remove'])]
+    
     private ?Eleves $eleve = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -100,7 +95,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->eleves = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -222,36 +216,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Eleves>
-     */
-    public function getEleves(): Collection
-    {
-        return $this->eleves;
-    }
-
-    public function addElefe(Eleves $elefe): static
-    {
-        if (!$this->eleves->contains($elefe)) {
-            $this->eleves->add($elefe);
-            $elefe->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeElefe(Eleves $elefe): static
-    {
-        if ($this->eleves->removeElement($elefe)) {
-            // set the owning side to null (unless already changed)
-            if ($elefe->getUser() === $this) {
-                $elefe->setUser(null);
-            }
-        }
 
         return $this;
     }

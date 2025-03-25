@@ -73,14 +73,20 @@ class Eleves
     // Pour le numéro d'extrait
     #[ORM\Column(name: 'numero_extrait', length: 30, unique: true)]
     #[Assert\NotBlank(message: "Le numéro d'extrait est obligatoire")]
+    #[Assert\Length(
+        min: 5,
+        max: 20,
+        minMessage: 'Nom designation must be at least {{ limit }} characters long.',
+        maxMessage: 'Nom designation cannot be longer than {{ limit }} characters.'
+    )]
     #[Assert\Regex(
-        pattern: "/^[A-Z0-9-]{5,30}$/",
+        pattern: '/^[A-Z0-9-\/]{5,30}$/',
         message: "Format invalide (lettres majuscules, chiffres et tirets)"
     )]
     private ?string $numeroExtrait = null;
 
     #[ORM\Column]
-    private ?bool $isActif = false;
+    private ?bool $isActif = true;
 
     #[ORM\Column]
     private ?bool $isAllowed = false;
@@ -97,16 +103,13 @@ class Eleves
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $fullname = null;
 
-    #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',)]
-    private ?Users $user = null;
-
     #[ORM\Column(length: 1)]
     #[Assert\Choice(choices: ['P', 'B', 'E'], message: "Le Statut Financier doit être 'P' ou 'B' ou 'E")]
     private ?string $statutFinance = 'P';
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id')]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',onDelete:"CASCADE")]
+
     private ?Classes $classe = null;
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
@@ -132,19 +135,45 @@ class Eleves
      * @var Collection<int, Departs>
      */
     #[ORM\OneToMany(targetEntity: Departs::class, mappedBy: 'eleve', orphanRemoval: true, cascade: ['persist'])]
+    #[Assert\Valid]
     private Collection $departs;
 
     /**
      * @var Collection<int, Santes>
      */
-    #[ORM\OneToMany(targetEntity: Santes::class, mappedBy: 'eleve')]
+    #[ORM\OneToMany(targetEntity: Santes::class, mappedBy: 'eleve', cascade: ['persist', 'remove'])]
+    #[Assert\Valid]
     private Collection $santes;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?Redoublements1 $redoublement1 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?Redoublements2 $redoublement2 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?Redoublements3 $redoublement3 = null;
+
+    #[ORM\Column(length: 30)]
+    private ?string $matricule = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?EcoleProvenances $ecoleRecrutement = null;
+
+    /**
+     * @var Collection<int, EcoleProvenances>
+     */
+    #[ORM\ManyToMany(targetEntity: EcoleProvenances::class, inversedBy: 'elevesAnDernier', cascade: ['persist'])]
+    #[Assert\Valid]
+    private Collection $ecoleAnDernier;
 
     public function __construct()
     {
         $this->dossierEleves = new ArrayCollection();
         $this->departs = new ArrayCollection();
         $this->santes = new ArrayCollection();
+        $this->ecoleAnDernier = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -339,18 +368,6 @@ class Eleves
     public function setFullname(?string $fullname): static
     {
         $this->fullname = $fullname;
-
-        return $this;
-    }
-
-    public function getUser(): ?Users
-    {
-        return $this->user;
-    }
-
-    public function setUser(?Users $user): static
-    {
-        $this->user = $user;
 
         return $this;
     }
@@ -558,6 +575,90 @@ class Eleves
                 $sante->setEleve(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRedoublement1(): ?Redoublements1
+    {
+        return $this->redoublement1;
+    }
+
+    public function setRedoublement1(?Redoublements1 $redoublement1): static
+    {
+        $this->redoublement1 = $redoublement1;
+
+        return $this;
+    }
+
+    public function getRedoublement2(): ?Redoublements2
+    {
+        return $this->redoublement2;
+    }
+
+    public function setRedoublement2(?Redoublements2 $redoublement2): static
+    {
+        $this->redoublement2 = $redoublement2;
+
+        return $this;
+    }
+
+    public function getRedoublement3(): ?Redoublements3
+    {
+        return $this->redoublement3;
+    }
+
+    public function setRedoublement3(?Redoublements3 $redoublement3): static
+    {
+        $this->redoublement3 = $redoublement3;
+
+        return $this;
+    }
+
+    public function getMatricule(): ?string
+    {
+        return $this->matricule;
+    }
+
+    public function setMatricule(string $matricule): static
+    {
+        $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    public function getEcoleRecrutement(): ?EcoleProvenances
+    {
+        return $this->ecoleRecrutement;
+    }
+
+    public function setEcoleRecrutement(?EcoleProvenances $ecoleRecrutement): static
+    {
+        $this->ecoleRecrutement = $ecoleRecrutement;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EcoleProvenances>
+     */
+    public function getEcoleAnDernier(): Collection
+    {
+        return $this->ecoleAnDernier;
+    }
+
+    public function addEcoleAnDernier(EcoleProvenances $ecoleAnDernier): static
+    {
+        if (!$this->ecoleAnDernier->contains($ecoleAnDernier)) {
+            $this->ecoleAnDernier->add($ecoleAnDernier);
+        }
+
+        return $this;
+    }
+
+    public function removeEcoleAnDernier(EcoleProvenances $ecoleAnDernier): static
+    {
+        $this->ecoleAnDernier->removeElement($ecoleAnDernier);
 
         return $this;
     }

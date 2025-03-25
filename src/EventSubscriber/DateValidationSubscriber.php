@@ -41,7 +41,7 @@ class DateValidationSubscriber implements EventSubscriberInterface
             $dateRecrutement = $form->get('dateRecrutement')->getData();
 
             if ($dateInscription instanceof \DateTime && $dateRecrutement instanceof \DateTime) {
-                if ($dateInscription <= $dateRecrutement) {
+                if ($dateInscription < $dateRecrutement) {
                     $form->get('dateInscription')->addError(
                         new FormError("La date d'inscription doit être postérieure à la date de recrutement.")
                     );

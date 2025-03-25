@@ -31,8 +31,15 @@ class Redoublements3
     #[ORM\JoinColumn(nullable: false)]
     private ?Scolarites2 $scolarite2 = null;
 
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'redoublement3')]
+    private Collection $eleves;
+
     public function __construct()
     {
+        $this->eleves = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -89,6 +96,36 @@ class Redoublements3
     public function setScolarite2(?Scolarites2 $scolarite2): static
     {
         $this->scolarite2 = $scolarite2;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setRedoublement3($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getRedoublement3() === $this) {
+                $elefe->setRedoublement3(null);
+            }
+        }
 
         return $this;
     }

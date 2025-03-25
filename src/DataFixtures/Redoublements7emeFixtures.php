@@ -41,38 +41,647 @@ class Redoublements7emeFixtures extends Fixture implements DependentFixtureInter
                 foreach ($scolarites2 as $scolarite2) {
                     $scolaritee2 = $scolarite2->getScolarite();
 
-                    // Niveau 7ème Année
-                    if ($niveauDesignation === '7ème Année') {
-                        if ($scolaritee1 == 6 && $scolaritee2 == 2) {
-                            // 1er redoublement 7ème année
+                    // Niveau 1ère année 1er Redoublement
+                    if ($niveauDesignation === '7ème Année' && $scolaritee1 == 7 && $scolaritee2 == 1) {
+                        for ($i = 0; $i < 6; $i++) {
+                            //redoublement 3ème année
+                            if ($i == 0) {
+                                //1er redoublement 1ère année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau1ere);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 1) {
+                                //1er reoublement 2ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau2eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 2) {
+                                //1er reoublement 3ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau3eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 3) {
+                                //1er reoublement 4ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau4eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 4) {
+                                //1er reoublement 5ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau5eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 5) {
+                                //1er reoublement 6ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau6eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                            }
+                        }
+                    } elseif ($niveauDesignation === '7ème Année' && $scolaritee1 == 6 && $scolaritee2 == 2) {
+                        for ($i = 0; $i < 1; $i++) {
                             $redoublement1 = new Redoublements1();
                             $redoublement1->setNiveau($niveau7eme);
                             $redoublement1->setScolarite1($scolarite1);
                             $redoublement1->setScolarite2($scolarite2);
                             $manager->persist($redoublement1);
-                        } elseif ($scolaritee1 == 6 && $scolaritee2 == 3) {
-                            // 1er redoublement 7ème année
+                        }
+                    } elseif ($niveauDesignation === '7ème Année' && $scolaritee1 == 8 && $scolaritee2 == 1) {
+                        for ($i = 0; $i < 6; $i++) {
+                            //redoublement 3ème année
+                            if ($i == 0) {
+                                //1er redoublement 1ère année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau1ere);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 5; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau2eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau3eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 2) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau4eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 3) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 4) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 1) {
+                                //1er reoublement 2ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau2eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 4; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau3eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau4eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 2) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 3) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 2) {
+                                //1er reoublement 3ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau3eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 3; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau4eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 2) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 3) {
+                                //1er reoublement 4ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau4eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 2; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 4) {
+                                //1er reoublement 5ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau5eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($niveau6eme);
+                                    $redoublement2->setRedoublement1($redoublement1);
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 5) {
+                                //1er reoublement 5ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau6eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($niveau6eme);
+                                    $redoublement2->setRedoublement1($redoublement1);
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                                $manager->persist($redoublement1);
+                            }
+                        }
+                    } elseif ($niveauDesignation === '7ème Année' && $scolaritee1 == 7 && $scolaritee2 == 2) {
+                        for ($i = 0; $i < 6; $i++) {
+                            //redoublement 3ème année
+                            if ($i == 0) {
+                                //1er redoublement 1ère année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau1ere);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($this->getNiveauByIndex2ndCycle($a, $niveau7eme));
+                                    $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                            } elseif ($i == 1) {
+                                //1er reoublement 2ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau2eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($this->getNiveauByIndex2ndCycle($a, $niveau7eme));
+                                    $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                            } elseif ($i == 2) {
+                                //1er reoublement 3ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau3eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($this->getNiveauByIndex2ndCycle($a, $niveau7eme));
+                                    $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                            } elseif ($i == 3) {
+                                //1er reoublement 4ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau4eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($this->getNiveauByIndex2ndCycle($a, $niveau7eme));
+                                    $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                            } elseif ($i == 4) {
+                                //1er reoublement 5ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau5eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($this->getNiveauByIndex2ndCycle($a, $niveau7eme));
+                                    $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                            } elseif ($i == 5) {
+                                //1er reoublement 6ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau6eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                $manager->persist($redoublement1);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($this->getNiveauByIndex2ndCycle($a, $niveau7eme));
+                                    $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                }
+                            }
+                        }
+                    } elseif ($niveauDesignation === '7ème Année' && $scolaritee1 == 6 && $scolaritee2 == 3) {
+                        for ($i = 0; $i < 1; $i++) {
                             $redoublement1 = new Redoublements1();
                             $redoublement1->setNiveau($niveau7eme);
                             $redoublement1->setScolarite1($scolarite1);
                             $redoublement1->setScolarite2($scolarite2);
                             $manager->persist($redoublement1);
+
                             for ($a = 0; $a < 1; $a++) {
-                                // 2ème redoublement 7ème année
                                 $redoublement2 = new Redoublements2();
                                 $redoublement2->setNiveau($niveau7eme);
-                                $redoublement2->setRedoublement1($redoublement1);
+                                $redoublement2->setRedoublement1($redoublement1); // Lien avec Redoublements1
                                 $redoublement2->setScolarite1($scolarite1);
                                 $redoublement2->setScolarite2($scolarite2);
                                 $manager->persist($redoublement2);
                             }
-
-                        } elseif ($scolaritee1 == 7 && $scolaritee2 == 2) {
-                            $this->createRedoublementsForLevels($manager, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme, $niveau7eme, $scolarite1, $scolarite2, false);
-                        } elseif ($scolaritee1 == 7 && $scolaritee2 == 3) {
-                            $this->createRedoublementsForLevels($manager, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme, $niveau7eme, $scolarite1, $scolarite2, true);
-                        } elseif ($scolaritee1 == 8 && $scolaritee2 == 2) {
-                            $this->createRedoublementsForLevelsWithRedoublement3($manager, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme, $niveau7eme, $scolarite1, $scolarite2);
+                        }
+                    } elseif ($niveauDesignation === '7ème Année' && $scolaritee1 == 8 && $scolaritee2 == 2) {
+                        for ($i = 0; $i < 6; $i++) {
+                            //redoublement 3ème année
+                            if ($i == 0) {
+                                //1er redoublement 1ère année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau1ere);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 5; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau2eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau3eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 2) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau4eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 3) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 4) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 1) {
+                                //1er reoublement 2ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau2eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 4; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau3eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau4eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 2) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 3) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 2) {
+                                //1er reoublement 3ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau3eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 3; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau4eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 2) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 3) {
+                                //1er reoublement 4ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau4eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 2; $a++) {
+                                    if ($a == 0) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau5eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    } elseif ($a == 1) {
+                                        $redoublement2 = new Redoublements2();
+                                        $redoublement2->setNiveau($niveau6eme);
+                                        $redoublement2->setRedoublement1($redoublement1);
+                                        $redoublement2->setScolarite1($scolarite1);
+                                        $redoublement2->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement2);
+                                        for ($b=0; $b <1 ; $b++) { 
+                                            $redoublement3 = new Redoublements3();
+                                            $redoublement3->setNiveau($niveau7eme);
+                                            $redoublement3->setRedoublement2($redoublement2);
+                                            $redoublement3->setScolarite1($scolarite1);
+                                            $redoublement3->setScolarite2($scolarite2);
+                                            $manager->persist($redoublement3);
+                                        }                    
+                                    }
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 4) {
+                                //1er reoublement 5ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau5eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($niveau6eme);
+                                    $redoublement2->setRedoublement1($redoublement1);
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                    for ($b=0; $b <1 ; $b++) { 
+                                        $redoublement3 = new Redoublements3();
+                                        $redoublement3->setNiveau($niveau7eme);
+                                        $redoublement3->setRedoublement2($redoublement2);
+                                        $redoublement3->setScolarite1($scolarite1);
+                                        $redoublement3->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement3);
+                                    }                
+                                }
+                                $manager->persist($redoublement1);
+                            } elseif ($i == 5) {
+                                //1er reoublement 5ème année
+                                $redoublement1 = new Redoublements1();
+                                $redoublement1->setNiveau($niveau6eme);
+                                $redoublement1->setScolarite1($scolarite1);
+                                $redoublement1->setScolarite2($scolarite2);
+                                for ($a = 0; $a < 1; $a++) {
+                                    $redoublement2 = new Redoublements2();
+                                    $redoublement2->setNiveau($niveau6eme);
+                                    $redoublement2->setRedoublement1($redoublement1);
+                                    $redoublement2->setScolarite1($scolarite1);
+                                    $redoublement2->setScolarite2($scolarite2);
+                                    $manager->persist($redoublement2);
+                                    for ($b=0; $b <1 ; $b++) { 
+                                        $redoublement3 = new Redoublements3();
+                                        $redoublement3->setNiveau($niveau7eme);
+                                        $redoublement3->setRedoublement2($redoublement2);
+                                        $redoublement3->setScolarite1($scolarite1);
+                                        $redoublement3->setScolarite2($scolarite2);
+                                        $manager->persist($redoublement3);
+                                    }                
+                                }
+                                $manager->persist($redoublement1);
+                            }
                         }
                     }
                 }
@@ -82,89 +691,7 @@ class Redoublements7emeFixtures extends Fixture implements DependentFixtureInter
         $manager->flush();
     }
 
-    private function createRedoublementsForLevels(
-        ObjectManager $manager,
-        $niveau1ere,
-        $niveau2eme,
-        $niveau3eme,
-        $niveau4eme,
-        $niveau5eme,
-        $niveau6eme,
-        $niveau7eme,
-        $scolarite1,
-        $scolarite2,
-        bool $withRedoublement3
-    ): void {
-        for ($i = 0; $i < 6; $i++) {
-            $redoublement1 = new Redoublements1();
-            $redoublement1->setNiveau($this->getNiveauByIndex($i, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-            $redoublement1->setScolarite1($scolarite1);
-            $redoublement1->setScolarite2($scolarite2);
-            $manager->persist($redoublement1);
-
-            if ($withRedoublement3) {
-                $redoublement2 = new Redoublements2();
-                $redoublement2->setNiveau($niveau7eme);
-                $redoublement2->setRedoublement1($redoublement1);
-                $redoublement2->setScolarite1($scolarite1);
-                $redoublement2->setScolarite2($scolarite2);
-                $manager->persist($redoublement2);
-
-                $redoublement3 = new Redoublements3();
-                $redoublement3->setNiveau($niveau7eme);
-                $redoublement3->setRedoublement2($redoublement2);
-                $redoublement3->setScolarite1($scolarite1);
-                $redoublement3->setScolarite2($scolarite2);
-                $manager->persist($redoublement3);
-            } else {
-                $redoublement2 = new Redoublements2();
-                $redoublement2->setNiveau($niveau7eme);
-                $redoublement2->setRedoublement1($redoublement1);
-                $redoublement2->setScolarite1($scolarite1);
-                $redoublement2->setScolarite2($scolarite2);
-                $manager->persist($redoublement2);
-            }
-        }
-    }
-
-    private function createRedoublementsForLevelsWithRedoublement3(
-        ObjectManager $manager,
-        $niveau1ere,
-        $niveau2eme,
-        $niveau3eme,
-        $niveau4eme,
-        $niveau5eme,
-        $niveau6eme,
-        $niveau7eme,
-        $scolarite1,
-        $scolarite2
-    ): void {
-        for ($i = 0; $i < 6; $i++) {
-            $redoublement1 = new Redoublements1();
-            $redoublement1->setNiveau($this->getNiveauByIndex($i, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-            $redoublement1->setScolarite1($scolarite1);
-            $redoublement1->setScolarite2($scolarite2);
-            $manager->persist($redoublement1);
-
-            for ($a = 0; $a < 5 - $i; $a++) {
-                $redoublement2 = new Redoublements2();
-                $redoublement2->setNiveau($this->getNiveauByIndex($a + $i + 1, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme));
-                $redoublement2->setRedoublement1($redoublement1);
-                $redoublement2->setScolarite1($scolarite1);
-                $redoublement2->setScolarite2($scolarite2);
-                $manager->persist($redoublement2);
-
-                $redoublement3 = new Redoublements3();
-                $redoublement3->setNiveau($niveau7eme);
-                $redoublement3->setRedoublement2($redoublement2);
-                $redoublement3->setScolarite1($scolarite1);
-                $redoublement3->setScolarite2($scolarite2);
-                $manager->persist($redoublement3);
-            }
-        }
-    }
-
-    private function getNiveauByIndex(int $index, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme)
+    private function getNiveauByIndex1erCycle(int $index, $niveau1ere, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme)
     {
         switch ($index) {
             case 0:
@@ -179,8 +706,54 @@ class Redoublements7emeFixtures extends Fixture implements DependentFixtureInter
                 return $niveau5eme;
             case 5:
                 return $niveau6eme;
-            default:
-                throw new \InvalidArgumentException("Index de niveau invalide.");
+                //default:
+                //    throw new \InvalidArgumentException("Index de niveau invalide.");
+        }
+    }
+
+    private function getNiveauByIndex1erCyclehors1ereAnnee(int $index, $niveau2eme, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme)
+    {
+        switch ($index) {
+            case 0:
+                return $niveau2eme;
+            case 1:
+                return $niveau3eme;
+            case 2:
+                return $niveau4eme;
+            case 3:
+                return $niveau5eme;
+            case 4:
+                return $niveau6eme;
+                //default:
+                //    throw new \InvalidArgumentException("Index de niveau invalide.");
+        }
+    }
+
+    private function getNiveauByIndex1erCyclehors2emeAnnee(int $index, $niveau3eme, $niveau4eme, $niveau5eme, $niveau6eme)
+    {
+        switch ($index) {
+            case 0:
+                return $niveau3eme;
+            case 1:
+                return $niveau4eme;
+            case 2:
+                return $niveau5eme;
+            case 3:
+                return $niveau6eme;
+                //default:
+                //    throw new \InvalidArgumentException("Index de niveau invalide.");
+        }
+    }
+
+
+
+    private function getNiveauByIndex2ndCycle(int $index, $niveau7eme)
+    {
+        switch ($index) {
+            case 0:
+                return $niveau7eme;
+                //default:
+                //    throw new \InvalidArgumentException("Index de niveau invalide.");
         }
     }
 

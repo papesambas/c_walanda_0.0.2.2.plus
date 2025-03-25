@@ -75,22 +75,6 @@ class Redoublements1ereFixtures extends Fixture implements DependentFixtureInter
         $manager->flush();
     }
 
-    private function configRedoublement1(ObjectManager $manager, $niveau, $redoublement1, $scolarite1, $scolarite2)
-    {
-        $redoublement1->setNiveau($niveau);
-        $redoublement1->setScolarite1($scolarite1);
-        $redoublement1->setScolarite2($scolarite2);
-        $manager->persist($redoublement1);
-    }
-    private function configRedoublement2(ObjectManager $manager, $niveau, $redoublement2, $redoublement1, $scolarite1, $scolarite2)
-    {
-        $redoublement2->setNiveau($niveau);
-        $redoublement2->setRedoublement1($redoublement1);
-        $redoublement2->setScolarite1($scolarite1);
-        $redoublement2->setScolarite2($scolarite2);
-        $manager->persist($redoublement2);
-    }
-
     public function getDependencies(): array
     {
         return [

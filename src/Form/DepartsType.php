@@ -3,25 +3,28 @@
 namespace App\Form;
 
 use App\Entity\Departs;
-use App\Entity\eleves;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class DepartsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('dateDepart', null, [
-                'widget' => 'single_text',
+            //->add('dateDepart')
+            ->add('motif', TextType::class, [
+                'label' => 'Motif',
+                'attr' => ['placeholder' => "Motif du départ"],
+                'required' => false,
             ])
-            ->add('ecoleDestination')
-            ->add('eleve', EntityType::class, [
-                'class' => eleves::class,
-                'choice_label' => 'id',
+            ->add('ecoleDestination', TextType::class, [
+                'label' => 'Ecole de destination',
+                'attr' => ['placeholder' => "Adresse du domicile"],
+                'required' => false,
             ])
+            //->add('eleve')
         ;
     }
 
