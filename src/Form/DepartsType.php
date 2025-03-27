@@ -17,12 +17,12 @@ class DepartsType extends AbstractType
             ->add('motif', TextType::class, [
                 'label' => 'Motif',
                 'attr' => ['placeholder' => "Motif du départ"],
-                'required' => false,
+                'required' => true,
             ])
             ->add('ecoleDestination', TextType::class, [
                 'label' => 'Ecole de destination',
-                'attr' => ['placeholder' => "Adresse du domicile"],
-                'required' => false,
+                'attr' => ['placeholder' => "Adresse de l'établissement"],
+                'required' => true,
             ])
             //->add('eleve')
         ;

@@ -25,7 +25,7 @@ class StatutsRepository extends ServiceEntityRepository
             ->setParameter('transfert', 'Transfert Arrivé');
     
         if ($niveaux) {
-            $qb->join('s.niveaux', 'n')
+            $qb->join('s.niveau', 'n')
                ->andWhere('n.id = :niveauId')
                ->setParameter('niveauId', $niveaux->getId());
         }
@@ -36,7 +36,7 @@ class StatutsRepository extends ServiceEntityRepository
     public function findByNiveau(int $niveauId): array
     {
         $query = $this->createQueryBuilder('s')
-            ->join('s.niveaux', 'n')
+            ->join('s.niveau', 'n')
             ->where('n.id = :niveauId')
             ->setParameter('niveauId', $niveauId)
             ->getQuery();

@@ -19,27 +19,41 @@ class departsEntityListener
         $this->Slugger = $Slugger;
     }
 
-    public function prePersist(Departs $depart, LifecycleEventArgs $arg): void
+    public function prePersist(Departs $departs, LifecycleEventArgs $arg): void
     {
-        /*$user = $this->Securty->getUser();
+        $user = $this->Securty->getUser();
         if ($user === null) {
-            throw new LogicException('User cannot be null here ...');
-        }*/
-
-
-        $depart
+            $departs
+            ->setCreatedAt(new \DateTimeImmutable('now'))
+            ->setSlug($this->getClassesSlug($departs));
+        }else{
+            $departs
+            ->setCreatedAt(new \DateTimeImmutable('now'))
             ->setDateDepart(new \DateTimeImmutable('now'))
-            ->setCreatedAt(new \DateTimeImmutable('now'));
+            ->setCreatedBy($user)
+            ->setSlug($this->getClassesSlug($departs));
+        }
     }
 
-    public function preUpdate(Departs $depart, LifecycleEventArgs $arg): void
+    public function preUpdate(Departs $departs, LifecycleEventArgs $arg): void
     {
-        /*$user = $this->Securty->getUser();
+        $user = $this->Securty->getUser();
         if ($user === null) {
-            throw new LogicException('User cannot be null here ...');
-        }*/
+            $departs
+            ->setUpdatedAt(new \DateTimeImmutable('now'))
+            ->setSlug($this->getClassesSlug($departs));
+        }else{
+            $departs
+            ->setUpdatedAt(new \DateTimeImmutable('now'))
+            ->setUpdatedBy($user)
+            ->setSlug($this->getClassesSlug($departs));
+        }
+    }
 
-        $depart
-            ->setUpdatedAt(new \DateTimeImmutable('now'));
+
+    private function getClassesSlug(Departs $departs): string
+    {
+        $slug = mb_strtolower($departs->getMotif() . '-' . $departs->getId() . '-' . time(), 'UTF-8');
+        return $this->Slugger->slug($slug);
     }
 }

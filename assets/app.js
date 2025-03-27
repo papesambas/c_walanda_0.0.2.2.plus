@@ -27,5 +27,6 @@ import './scripts/select2.js';
 import './scripts/eleves.js';
 import './scripts/checkbox.js';
 import './scripts/sante.js';
+import './scripts/deleteDoc.js'
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

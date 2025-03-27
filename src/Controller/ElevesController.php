@@ -182,7 +182,7 @@ final class ElevesController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
+            //try {
                 $documents = $form->get('document')->getData();
                 //$extrait = $form->get('extrait')->getData();
                 foreach ($documents as $document) {
@@ -232,12 +232,12 @@ final class ElevesController extends AbstractController
                 $entityManager->flush();
 
                 return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
-            } catch (\Exception $e) {
+            /*} catch (\Exception $e) {
                 // Journalisation de l'erreur
                 $this->addFlash('error', 'Une erreur s\'est produite lors de l\'enregistrement des modifications.');
                 // Vous pouvez également logger l'erreur pour un débogage ultérieur
                 // $this->logger->error('Erreur lors de la modification de l\'élève : ' . $e->getMessage());
-            }
+            }*/
         }
 
         return $this->render('eleves/edit.html.twig', [
@@ -261,6 +261,10 @@ final class ElevesController extends AbstractController
     #[Route('/delete/document/{id}', name: 'app_eleve_documents_delete', methods: ['DELETE'])]
     public function deleteDocument(Request $request, DossierEleves $document, EntityManagerInterface $entityManager)
     {
+        if (!$document) {
+            return new JsonResponse(['success' => false, 'error' => 'Document introuvable'], 404);
+        }
+
         $data = json_decode($request->getContent(), true);
         //On vérifie si le token est valide
         if ($this->isCsrfTokenValid('delete' . $document->getId(), $data['_token'])) {

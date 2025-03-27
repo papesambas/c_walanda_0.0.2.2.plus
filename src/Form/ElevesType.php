@@ -15,20 +15,23 @@ use App\Entity\Statuts;
 use App\Entity\Communes;
 use App\Entity\Scolarites1;
 use App\Entity\Scolarites2;
+use Psr\Log\LoggerInterface;
 use App\Entity\LieuNaissances;
 use App\Entity\Redoublements1;
 use App\Entity\Redoublements2;
 use App\Entity\Redoublements3;
 use App\Entity\EcoleProvenances;
-use App\EventSubscriber\IsAdminFieldsSubscriber;
 use Doctrine\ORM\EntityRepository;
+use App\Repository\NiveauxRepository;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use App\Repository\Scolarites2Repository;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use App\Repository\Redoublements1Repository;
+use App\EventSubscriber\IsAdminFieldsSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\All;
 use Vich\UploaderBundle\Form\Type\VichImageType;
@@ -52,12 +55,23 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ElevesType extends AbstractType
 {
+    private array $niveaux = [];
     public function __construct(
         private Scolarites2Repository $scolarites2Repository,
         private EntityManagerInterface $em,
         private Redoublements1Repository $redoublements1Repository,
         private IsAdminFieldsSubscriber $isAdminFieldsSubscriber,
-    ) {}
+        private Security $security,
+        private NiveauxRepository $niveauxRepository,
+        private LoggerInterface $logger,
+    ) {
+        $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+            $this->niveaux = $this->niveauxRepository->findByEtablissement($etablissement);
+            $this->logger->info('Niveaux chargés', ['niveaux' => $this->niveaux]);
+        }
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -82,6 +96,28 @@ class ElevesType extends AbstractType
                 'download_label' => 'Télécharger',
                 'image_uri'         => false,
                 'asset_helper' => true,
+            ])
+            ->add('document', FileType::class, [
+                'label' => 'Télécharger Documents (Fichier PDF/Word)',
+                'mapped' => false,
+                'required' => false,
+                'multiple' => true,
+                'constraints' => [
+                    new All([
+                        'constraints' => [
+                            new File([
+                                'maxSize' => '2048k',
+                                'mimeTypes' => [
+                                    'application/pdf',
+                                    'application/x-pdf',
+                                    'application/msword',
+                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                ],
+                                'mimeTypesMessage' => 'Format valid valid PDF ou word',
+                            ])
+                        ]
+                    ]),
+                ]
             ])
             ->add('document', FileType::class, [
                 'label' => 'Télécharger Documents (Fichier PDF/Word)',
@@ -277,8 +313,10 @@ class ElevesType extends AbstractType
                 'choice_label' => 'designation',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('n')
-                        ->orderBy('n.designation', 'ASC');
+                        ->orderBy('n.id', 'ASC')
+                        ->setCacheable(true);
                 },
+                'choices' => $this->niveaux,
                 'attr' => [
                     'class' => 'select-niveau'
                 ],
@@ -752,14 +790,12 @@ class ElevesType extends AbstractType
         $scolarite1 = $scolarites2 ? $scolarites2->getScolarite1() : [];
         $niveau = $scolarites2 ? $scolarites2->getNiveau() : [];
 
-        dump($scolarites2, $scolarite1, $niveau);
-
         $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
             'redoublement1',
             EntityType::class,
             null,
             [
-                'class' => Redoublements2::class,
+                'class' => Redoublements1::class,
                 'label' => 'Redoublement 1',
                 'placeholder' => '2ème Redoub',
                 'choice_label' => 'niveau',

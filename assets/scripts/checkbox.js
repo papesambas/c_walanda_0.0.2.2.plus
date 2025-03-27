@@ -5,8 +5,8 @@ $(document).ready(function () {
         let checkbox = $('#eleves_isHandicap');
         let message = $('#eleves_natureHandicape');
         inputField.prop('required', false); // Ne pas rendre le champ obligatoire
- console.log(checkbox.length && message.length);
- 
+        console.log(checkbox.length && message.length);
+
         // Vérifier si les éléments existent
         if (checkbox.length && message.length) {
             checkbox.on('change', function () {
@@ -29,23 +29,40 @@ $(document).ready(function () {
         let checkboxAdmis = $('#eleves_isAdmis');
         let checkboxAllowed = $('#eleves_isAllowed');
         let departContainer = $('#departs-container');
+        let departsCollection = $("#departs");
+        let form = $("form");
         //let checkboxActif = $('#{{ form.isActif.vars.id }}'); // Récupération de l'ID du champ actif
         //let checkboxAdmis = $('#{{ form.isAdmis.vars.id }}'); // Récupération de l'ID du champ admis
-    
+
         function toggleDepartContainer() {
             if (!checkboxActif.prop('checked') && !checkboxAdmis.prop('checked')) {
                 departContainer.show(); // Afficher le conteneur
             } else {
                 departContainer.hide(); // Cacher le conteneur
+                //departsCollection.empty(); // Supprimer les entrées existantes
             }
         }
-    
+
+        function validateDepartCollection(event) {
+            if (!checkboxActif.prop("checked") && !checkboxAdmis.prop("checked")) {
+                let totalDeparts = departsCollection.children(".col-12").length; // Vérifier les entrées ajoutées
+
+                if (totalDeparts === 0) {
+                    event.preventDefault(); // Bloquer la soumission
+                    alert("Vous devez ajouter au moins un départ !");
+                }
+            }
+        }
+
         // Vérifier au chargement initial
         toggleDepartContainer();
-    
+
         // Ajouter un écouteur d'événement sur les cases à cocher
         checkboxActif.on('change', toggleDepartContainer);
         checkboxAdmis.on('change', toggleDepartContainer);
+
+        // Vérifier avant soumission du formulaire
+        form.on("submit", validateDepartCollection);
 
         // Récupérer les rôles de l'utilisateur depuis l'attribut data
         /*let userRoles = checkboxAdmis.data('user-roles') ? checkboxAdmis.data('user-roles').split(',') : [];

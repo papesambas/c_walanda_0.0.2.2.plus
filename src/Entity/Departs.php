@@ -2,12 +2,18 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\EntityTrackingTrait;
+use App\Entity\Trait\SlugTrait;
 use App\Repository\DepartsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DepartsRepository::class)]
 class Departs
 {
+    use CreatedAtTrait;
+    use SlugTrait;
+    use EntityTrackingTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -22,6 +28,9 @@ class Departs
     #[ORM\ManyToOne(inversedBy: 'departs')]
     #[ORM\JoinColumn(nullable: false)]
     private ?eleves $eleve = null;
+
+    #[ORM\Column(length: 130)]
+    private ?string $motif = null;
 
     public function getId(): ?int
     {
@@ -60,6 +69,18 @@ class Departs
     public function setEleve(?eleves $eleve): static
     {
         $this->eleve = $eleve;
+
+        return $this;
+    }
+
+    public function getMotif(): ?string
+    {
+        return $this->motif;
+    }
+
+    public function setMotif(string $motif): static
+    {
+        $this->motif = $motif;
 
         return $this;
     }

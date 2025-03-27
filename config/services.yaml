@@ -9,16 +9,18 @@ parameters:
     documents_personnel_directory: '%kernel.project_dir%/public/uploads/personnels/documents'
     documents_administration_directory: '%kernel.project_dir%/public/administration/documents'
 
+
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-<<<<<<< Updated upstream
 
-=======
+    App\Service\OpenAIService:
+        arguments:
+            $apiKey: '%env(OPENAI_API_KEY)%'
+            $httpClient: '@http_client'
             
->>>>>>> Stashed changes
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
