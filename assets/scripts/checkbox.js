@@ -5,7 +5,6 @@ $(document).ready(function () {
         let checkbox = $('#eleves_isHandicap');
         let message = $('#eleves_natureHandicape');
         inputField.prop('required', false); // Ne pas rendre le champ obligatoire
-        console.log(checkbox.length && message.length);
 
         // Vérifier si les éléments existent
         if (checkbox.length && message.length) {
@@ -13,11 +12,9 @@ $(document).ready(function () {
                 if (checkbox.prop('checked')) {
                     message.show(); // Afficher le champ
                     inputField.prop('required', true); // Rendre le champ obligatoire
-                    console.log('Case "Handicap" cochée');
                 } else {
                     message.hide(); // Masquer le champ
                     inputField.prop('required', false); // Ne pas rendre le champ obligatoire
-                    console.log('Case "Handicap" décochée');
                 }
             }).trigger('change'); // Déclencher l'événement pour initialiser l'état
         }
@@ -28,6 +25,8 @@ $(document).ready(function () {
         let checkboxActif = $('#eleves_isActif');
         let checkboxAdmis = $('#eleves_isAdmis');
         let checkboxAllowed = $('#eleves_isAllowed');
+        checkboxActif.prop('required', false); // Ne pas rendre le champ obligatoire
+
         let departContainer = $('#departs-container');
         let departsCollection = $("#departs");
         let form = $("form");
@@ -49,7 +48,7 @@ $(document).ready(function () {
 
                 if (totalDeparts === 0) {
                     event.preventDefault(); // Bloquer la soumission
-                    alert("Vous devez ajouter au moins un départ !");
+                    alert("Vous devez ajouter au moins le motif du départ et l'école de destinantion !");
                 }
             }
         }
@@ -88,6 +87,7 @@ $(document).ready(function () {
             checkboxActif.prop('checked', false);
             checkboxAllowed.prop('checked', false);
             alert("Vous devez d'abord cocher 'Admis' pour pouvoir cocher 'Actif'.");
+
         }
 
 

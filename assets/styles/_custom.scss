@@ -167,3 +167,34 @@ form button:hover {
 .required-field {
     border-left: 3px solid #ff0000; /* Indication visuelle */
 }
+
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    background: #ff4444;
+    color: white;
+    border-radius: 5px;
+    z-index: 10000;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+.custom-warn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    background: #ffbb33;
+    color: black;
+    border-radius: 5px;
+    z-index: 10000;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+}

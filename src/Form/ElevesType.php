@@ -213,14 +213,12 @@ class ElevesType extends AbstractType
             ])
             ->add('isActif', CheckboxType::class, [
                 'label' => 'Actif',
-                'data' => true, // Case cochée par défaut
                 'attr' => [
                     'class' => 'custom-checkbox', // Classe CSS pour la case à cocher
                 ],
                 'label_attr' => [
                     'class' => 'custom-checkbox label', // Classe CSS pour le libellé
                 ],
-                'required' => true, // La case doit être cochée
                 'constraints' => [
                     //new IsTrue([
                     //    'message' => 'Vous devez cocher cette case pour continuer.', // Message d'erreur personnalisé

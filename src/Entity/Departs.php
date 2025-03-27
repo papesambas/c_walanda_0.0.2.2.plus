@@ -7,6 +7,7 @@ use App\Entity\Trait\EntityTrackingTrait;
 use App\Entity\Trait\SlugTrait;
 use App\Repository\DepartsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DepartsRepository::class)]
 class Departs
@@ -31,6 +32,11 @@ class Departs
 
     #[ORM\Column(length: 130)]
     private ?string $motif = null;
+
+    public function __toString()
+    {
+        return $this->motif ?? '';
+    }
 
     public function getId(): ?int
     {

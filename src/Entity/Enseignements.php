@@ -36,6 +36,11 @@ class Enseignements
         $this->etablissements = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->designation ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

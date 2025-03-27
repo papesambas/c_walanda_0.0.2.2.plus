@@ -21,6 +21,17 @@ import javascript from 'highlight.js/lib/languages/javascript';
 hljs.registerLanguage('javascript', javascript);
 hljs.highlightAll();
 
+import "./vendor/toastr/toastr.min.js"; // Import du script
+import "./vendor/toastr/toastr.min.css"; // Import du CSS
+
+// Configuration de Toastr (facultatif)
+toastr.options = {
+    closeButton: true,
+    progressBar: true,
+    positionClass: "toast-top-right",
+    timeOut: "3000",
+};
+
 // Import des styles Sass (optionnel)
 import './styles/app.scss';
 import './scripts/select2.js';

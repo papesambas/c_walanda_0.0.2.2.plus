@@ -59,7 +59,7 @@ class Peres
         $this->parents = new ArrayCollection();
     }
 
-    public function __tostring()
+    public function __toString()
     {
         return $this->fullname ?? '';
     }

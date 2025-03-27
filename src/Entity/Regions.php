@@ -38,7 +38,7 @@ class Regions
         $this->cercles = new ArrayCollection();
     }
 
-    public function __tostring()
+    public function __toString()
     {
         return $this->designation ?? '';
     }

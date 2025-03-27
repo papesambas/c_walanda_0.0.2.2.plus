@@ -40,7 +40,7 @@ class Communes
         $this->lieuNaissances = new ArrayCollection();
     }
 
-    public function __tostring()
+    public function __toString()
     {
         return $this->designation ?? '';
     }

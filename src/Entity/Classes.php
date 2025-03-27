@@ -60,6 +60,11 @@ class Classes
         $this->eleves = new ArrayCollection();
     }
 
+    public function __tostring()
+    {
+        return $this->designation ?? '';
+    }
+
     #[Assert\Callback]
     public function validateDisponibilite(ExecutionContextInterface $context): void
     {

@@ -64,7 +64,7 @@ class Scolarites2
 
     public function __toString()
     {
-        return $this->niveau ?? '';
+        return (string)$this->scolarite ?? '';
     }
 
 

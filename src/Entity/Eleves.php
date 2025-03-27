@@ -176,6 +176,11 @@ class Eleves
         $this->ecoleAnDernier = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->fullname ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;
