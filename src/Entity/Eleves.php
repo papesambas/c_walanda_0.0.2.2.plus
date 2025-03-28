@@ -282,6 +282,18 @@ class Eleves
         return $this;
     }
 
+    public function getAge(): ?int
+    {
+        if (!$this->dateNaissance) {
+            return null;
+        }
+    
+        // Utilisation de DateTimeImmutable pour éviter tout problème
+        $now = new \DateTimeImmutable();
+    
+        return $this->dateNaissance->diff($now)->y;
+    }
+    
     public function getDateExtrait(): ?\DateTimeImmutable
     {
         return $this->dateExtrait;

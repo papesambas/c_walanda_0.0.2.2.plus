@@ -6,7 +6,8 @@
 <div class="container-fluid mt-3">
     <h3 class="mb-4 d-flex justify-content-center fw-bold">{% trans %}Liste des Parents{% endtrans %}</h3>
     <div class="mb-3">
-        <a href="{{ path('app_parents_inscription') }}" class="btn btn-outline-success" aria-label="{% trans %}Inscription{% endtrans %}">
+        <a href="{{ path('app_parents_inscription') }}" class="btn btn-outline-success"
+            aria-label="{% trans %}Inscription{% endtrans %}">
             <i class="fas fa-arrow-left"></i> {% trans %}Inscription{% endtrans %}
         </a>
     </div>
@@ -45,17 +46,24 @@
                                 <tr>
                                     <td>{{ parent.id }}</td>
                                     <td>{{ parent.pere.fullname ?? '{% trans %}Père inconnu{% endtrans %}' }}</td>
-                                    <td>{{ parent.pere.profession ?? '{% trans %}Profession non renseignée{% endtrans %}' }}</td>
+                                    <td>{{ parent.pere.profession ?? '{% trans %}Profession non renseignée{% endtrans %}' }}
+                                    </td>
                                     <td>{{ parent.mere.fullname ?? '{% trans %}Mère inconnue{% endtrans %}' }}</td>
-                                    <td>{{ parent.mere.profession ?? '{% trans %}Profession non renseignée{% endtrans %}' }}</td>
+                                    <td>{{ parent.mere.profession ?? '{% trans %}Profession non renseignée{% endtrans %}' }}
+                                    </td>
                                     <td>
-                                        {% if app.request.attributes.get('_route') == 'app_parents_edit' %}
-                                        <a href="{{ path('app_parents_edit', {'id': parent.id}) }}" class="btn btn-warning btn-sm" aria-label="{% trans %}Modifier{% endtrans %}">
+                                        {% if app.request.attributes.get('_route') != 'app_parents_edit' and
+                                        is_granted('ROLE_SUPERADMIN') or is_granted('ROLE_ADMIN') or
+                                        is_granted('ROLE_DIRECTION') %}
+                                        <a href="{{ path('app_parents_edit', {'id': parent.id}) }}"
+                                            class="btn btn-warning btn-sm"
+                                            aria-label="{% trans %}Modifier{% endtrans %}">
                                             <i class="fas fa-edit"></i> {% trans %}Modifier{% endtrans %}
                                         </a>
                                         {% endif %}
                                         {% if app.request.attributes.get('_route') != 'app_parents_inscription' %}
-                                        <a href="{{ path('app_parents_show', {'id': parent.id}) }}" class="btn btn-info btn-sm" aria-label="{% trans %}Voir{% endtrans %}">
+                                        <a href="{{ path('app_parents_show', {'id': parent.id}) }}"
+                                            class="btn btn-info btn-sm" aria-label="{% trans %}Voir{% endtrans %}">
                                             <i class="fas fa-eye"></i> {% trans %}Voir{% endtrans %}
                                         </a>
                                         {% endif %}
@@ -63,7 +71,8 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center">{% trans %}Aucun parent trouvé{% endtrans %}</td>
+                                    <td colspan="6" class="text-center">{% trans %}Aucun parent trouvé{% endtrans %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -76,7 +85,8 @@
 
     <!-- Bouton Ajouter -->
     <div class="text-end mt-4">
-        <a href="{{ path('app_parents_new') }}" class="btn btn-success" aria-label="{% trans %}Ajouter un nouveau parent{% endtrans %}">
+        <a href="{{ path('app_parents_new') }}" class="btn btn-success"
+            aria-label="{% trans %}Ajouter un nouveau parent{% endtrans %}">
             <i class="bi bi-plus-circle"></i> {% trans %}Ajouter un nouveau parent{% endtrans %}
         </a>
     </div>

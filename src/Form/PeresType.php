@@ -159,7 +159,7 @@ class PeresType extends AbstractType
                     ]),
                 ],*/
                 'error_bubbling' => false,
-                'required' => true,
+                'required' => false,
                 'help' => 'Le numéro optionnel du père'
             ])
     

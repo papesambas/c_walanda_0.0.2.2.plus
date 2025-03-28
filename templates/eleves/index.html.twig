@@ -4,7 +4,7 @@
 
 {% block body %}
 <h3 class="text-primary fw-bold border-bottom pb-2">📚 Élèves - Index</h3>
-
+{% set route = app.request.attributes.get('_route') %}
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
@@ -16,13 +16,28 @@
                         <th>Fullname</th>
                         <th>Sexe</th>
                         <th>Né(e) le ..</th>
+                        <th>Age</th>
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        <th>Région de ...</th>
+                        {% endif %}
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        <th>Cercle de ...</th>
+                        {% endif %}
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        <th>Commune de ...</th>
+                        {% endif %}
+
                         <th>Né(e) A ..</th>
                         {#<th>DateExtrait</th>
                         <th>NumeroExtrait</th>#}
                         <th>Statut</th>
                         <th>Classe</th>
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
                         <th>Ecole An dernier ..</th>
+                        {% endif %}
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
                         <th>Ecole Recrutement</th>
+                        {% endif %}
 
                         <th>actions</th>
                     </tr>
@@ -44,7 +59,17 @@
                         <td><a class="text-black text-decoration-none" href="">{{ elefe.sexe }}</a></td>
                         <td><a class="text-black text-decoration-none"
                                 href="">{{ elefe.dateNaissance ? elefe.dateNaissance|date('d-m-Y') : '' }}</a></td>
-                        <td><a class="text-black text-decoration-none" href="">{{ elefe.lieuNaissance }}</a></td>
+                        <td><a class="text-black text-decoration-none" href="">{{ "%02d"|format(elefe.age) }} ans</a></td>
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        <td><a class="text-black text-decoration-none" href="{{ path('app_regions_show', {'slug': elefe.lieuNaissance.commune.cercle.region.slug}) }}">{{ elefe.lieuNaissance.commune.cercle.region }}</a></td>
+                        {% endif %}
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        <td><a class="text-black text-decoration-none" href="{{ path('app_cercles_show', {'slug': elefe.lieuNaissance.commune.cercle.slug}) }}">{{ elefe.lieuNaissance.commune.cercle }}</a></td>
+                        {% endif %}
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route == 'app_cercles_show' or route == 'app_regions_show'  %}
+                        <td><a class="text-black text-decoration-none" href="{{ path('app_communes_show', {'slug': elefe.lieuNaissance.commune.slug}) }}">{{ elefe.lieuNaissance.commune }}</a></td>
+                        {% endif %}
+                        <td><a class="text-black text-decoration-none" href="{{ path('app_lieu_naissances_show', {'slug': elefe.lieuNaissance.slug}) }}">{{ elefe.lieuNaissance }}</a></td>
                         {#<td><a class="text-black text-decoration-none"
                                 href="">{{ elefe.dateExtrait ? elefe.dateExtrait|date('d-m-Y') : '' }}</a></td>
                         <td><a class="text-black text-decoration-none" href="">{{ elefe.numeroExtrait }}</a></td>#}
@@ -55,7 +80,10 @@
                         <td><a class="text-black text-decoration-none"
                                 href="">{{ elefe.dateRecrutement ? elefe.dateRecrutement|date('d-m-Y') : '' }}</a></td>
                         #}
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
                         <td><a class="text-black text-decoration-none" href="">{{ elefe.ecoleRecrutement }}</a></td>
+                        {% endif %}
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
                         <td><a class="text-black text-decoration-none" href="">
                                 {% if elefe.ecoleAnDernier|length > 0 %}
                                 {{ elefe.ecoleAnDernier|last.designation }}
@@ -63,6 +91,7 @@
                                 Aucune école
                                 {% endif %}
                             </a></td>
+                        {% endif %}
                         {#<td>
                         <td>{{ elefe.isActif ? 'Yes' : 'No' }}</td>
                         <td>{{ elefe.isAllowed ? 'Yes' : 'No' }}</td>
@@ -73,53 +102,9 @@
                             </a>
                             <a href="{{ path('app_eleves_edit', {'id': elefe.id}) }}" class="btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i> Modifier
-                            </a>                            
+                            </a>
                         </td>
                         {% else %}
-                        {#<td><a class="text-danger text-decoration-none" href="">{{ elefe.matricule }}</a></td>
-                        <td><a class="text-decoration-none" href="">
-                                {% if elefe.imageName %}
-                                <img src="{{ vich_uploader_asset(elefe, 'imageFile') | imagine_filter('photo_identite') }}"
-                                    alt="Image de {{ elefe.nom }}" class="img-fluid">
-                                {% else %}
-                                <p>Aucune image disponible</p>
-                                {% endif %}
-                            </a></td>#}
-                        <td><a class="text-danger text-decoration-none" href="">{{ elefe.fullname }}</a></td>
-                        <td><a class="text-decoration-none" href="">{{ elefe.sexe }}</a></td>
-                        <td><a class="text-danger text-decoration-none"
-                                href="">{{ elefe.dateNaissance ? elefe.dateNaissance|date('d-m-Y') : '' }}</a></td>
-                        <td><a class="text-danger text-decoration-none" href="">{{ elefe.lieuNaissance }}</a></td>
-                        {#<td><a class="text-danger text-decoration-none"
-                                href="">{{ elefe.dateExtrait ? elefe.dateExtrait|date('d-m-Y') : '' }}</a></td>
-                        <td><a class="text-danger text-decoration-none" href="">{{ elefe.numeroExtrait }}</a></td>#}
-                        <td><a class="text-danger text-decoration-none" href="">{{ elefe.statut }}</a></td>
-                        <td><a class="text-danger text-decoration-none" href="">{{ elefe.classe }}</a></td>
-                        {#<td><a class="text-danger text-decoration-none"
-                                href="">{{ elefe.dateInscription ? elefe.dateInscription|date('d-m-Y') : '' }}</a></td>
-                        <td><a class="text-danger text-decoration-none"
-                                href="">{{ elefe.dateRecrutement ? elefe.dateRecrutement|date('d-m-Y') : '' }}</a></td>
-                        #}
-                        <td><a class="text-danger text-decoration-none" href="">{{ elefe.ecoleRecrutement }}</a></td>
-                        <td><a class="text-danger text-decoration-none" href="">
-                                {% if elefe.ecoleAnDernier|length > 0 %}
-                                {{ elefe.ecoleAnDernier|last.designation }}
-                                {% else %}
-                                Aucune école
-                                {% endif %}
-                            </a></td>
-                        {#<td>
-                        <td>{{ elefe.isActif ? 'Yes' : 'No' }}</td>
-                        <td>{{ elefe.isAllowed ? 'Yes' : 'No' }}</td>
-                        <td>{{ elefe.isAdmis ? 'Yes' : 'No' }}</td>#}
-                        <td>
-                            <a href="{{ path('app_eleves_show', {'id': elefe.id}) }}" class="btn btn-info btn-sm">
-                                <i class="fas fa-eye"></i> Voir
-                            </a>
-                            <a href="{{ path('app_eleves_edit', {'id': elefe.id}) }}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Modifier
-                            </a>                            
-                        </td>
                         {% endif %}
 
                     </tr>

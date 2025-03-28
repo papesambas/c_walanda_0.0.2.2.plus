@@ -158,7 +158,7 @@ class MeresType extends AbstractType
                     ]),
                 ],*/
                 'error_bubbling' => false,
-                'required' => true,
+                'required' => false,
                 'help' => 'Le numéro optionnel de la mère'
             ])
     

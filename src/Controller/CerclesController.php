@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Cercles;
 use App\Form\CerclesType;
 use App\Repository\CerclesRepository;
+use App\Repository\ElevesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,11 +43,12 @@ final class CerclesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_cercles_show', methods: ['GET'])]
-    public function show(Cercles $cercle): Response
+    #[Route('/{slug}', name: 'app_cercles_show', methods: ['GET'])]
+    public function show(ElevesRepository $elevesRepository, Cercles $cercle): Response
     {
-        return $this->render('cercles/show.html.twig', [
-            'cercle' => $cercle,
+        $eleves = $elevesRepository->findByCercle($cercle);
+        return $this->render('eleves/index.html.twig', [
+            'eleves' => $eleves,
         ]);
     }
 

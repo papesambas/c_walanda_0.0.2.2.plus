@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Regions;
 use App\Form\RegionsType;
+use App\Repository\ElevesRepository;
 use App\Repository\RegionsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,11 +43,12 @@ final class RegionsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_regions_show', methods: ['GET'])]
-    public function show(Regions $region): Response
+    #[Route('/{slug}', name: 'app_regions_show', methods: ['GET'])]
+    public function show(ElevesRepository $elevesRepository, Regions $region): Response
     {
-        return $this->render('regions/show.html.twig', [
-            'region' => $region,
+        $eleves = $elevesRepository->findByRegion($region);
+        return $this->render('eleves/index.html.twig', [
+            'eleves' => $eleves,
         ]);
     }
 

@@ -375,6 +375,7 @@ class ElevesType extends AbstractType
                 'error_bubbling' => false,
                 'required' => false,
             ])
+            
         ;
 
         // Vérifier si l'utilisateur peut éditer le champ "admis"

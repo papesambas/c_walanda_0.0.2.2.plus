@@ -31,7 +31,7 @@ class Departs
     private ?eleves $eleve = null;
 
     #[ORM\Column(length: 130)]
-    private ?string $motif = null;
+    private ?string $motif = 'Demande des parents';
 
     public function __toString()
     {

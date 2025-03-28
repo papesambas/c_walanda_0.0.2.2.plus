@@ -14,10 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/parents')]
 final class ParentsController extends AbstractController
 {
+    #[IsGranted('ROLE_USER')]
     #[Route(name: 'app_parents_index', methods: ['GET'])]
     public function index(
         Request $request, ParentsRepository $parentsRepository, PeresRepository $peresRepository, MeresRepository $meresRepository
@@ -44,7 +46,7 @@ final class ParentsController extends AbstractController
         ]);
     }
 
-    
+    #[IsGranted('ROLE_SECRETAIRE')]
     #[Route('/inscription', name: 'app_parents_inscription', methods: ['GET'])]
     public function inscription(
         Request $request,
@@ -104,6 +106,7 @@ final class ParentsController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_SECRETAIRE')]
     #[Route('/new', name: 'app_parents_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager,
         PeresRepository $peresRepository, MeresRepository $meresRepository
@@ -151,6 +154,7 @@ final class ParentsController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/{id}', name: 'app_parents_show', methods: ['GET'])]
     public function show(Parents $parent): Response
     {
@@ -159,6 +163,7 @@ final class ParentsController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_DIRECTION')]
     #[Route('/{id}/edit', name: 'app_parents_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Parents $parent, EntityManagerInterface $entityManager): Response
     {

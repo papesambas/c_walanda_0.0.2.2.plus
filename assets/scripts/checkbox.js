@@ -29,7 +29,7 @@ $(document).ready(function () {
 
         let departContainer = $('#departs-container');
         let departsCollection = $("#departs");
-        let form = $("form");
+        let form = $("form[name='eleves']");
         //let checkboxActif = $('#{{ form.isActif.vars.id }}'); // Récupération de l'ID du champ actif
         //let checkboxAdmis = $('#{{ form.isAdmis.vars.id }}'); // Récupération de l'ID du champ admis
 

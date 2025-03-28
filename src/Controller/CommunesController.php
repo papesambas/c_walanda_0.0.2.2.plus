@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Communes;
 use App\Form\CommunesType;
 use App\Repository\CommunesRepository;
+use App\Repository\ElevesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,11 +43,12 @@ final class CommunesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_communes_show', methods: ['GET'])]
-    public function show(Communes $commune): Response
+    #[Route('/{slug}', name: 'app_communes_show', methods: ['GET'])]
+    public function show(ElevesRepository $elevesRepository, Communes $commune): Response
     {
-        return $this->render('communes/show.html.twig', [
-            'commune' => $commune,
+        $eleves = $elevesRepository->findByCommune($commune);
+        return $this->render('eleves/index.html.twig', [
+            'eleves' => $eleves,
         ]);
     }
 

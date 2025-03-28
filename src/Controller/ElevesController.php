@@ -243,6 +243,7 @@ final class ElevesController extends AbstractController
         return $this->render('eleves/edit.html.twig', [
             'elefe' => $elefe,
             'form' => $form,
+            'age'=> $elefe->getAge(),
         ]);
     }
 

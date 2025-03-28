@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LieuNaissances;
 use App\Form\LieuNaissancesType;
+use App\Repository\ElevesRepository;
 use App\Repository\LieuNaissancesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,11 +43,12 @@ final class LieuNaissancesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_lieu_naissances_show', methods: ['GET'])]
-    public function show(LieuNaissances $lieuNaissance): Response
+    #[Route('/{slug}', name: 'app_lieu_naissances_show', methods: ['GET'])]
+    public function show(ElevesRepository $elevesRepository, LieuNaissances $lieuNaissance): Response
     {
-        return $this->render('lieu_naissances/show.html.twig', [
-            'lieu_naissance' => $lieuNaissance,
+        $eleves = $elevesRepository->findBy(["lieuNaissance"=>$lieuNaissance]);
+        return $this->render('eleves/index.html.twig', [
+            'eleves' => $eleves,
         ]);
     }
 
