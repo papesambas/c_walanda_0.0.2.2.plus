@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New IndisciplinePersonnel{% endblock %}
+
+{% block body %}
+    <h1>Create new IndisciplinePersonnel</h1>
+
+    {{ include('indiscipline_personnel/_form.html.twig') }}
+
+    <a href="{{ path('app_indiscipline_personnel_index') }}">back to list</a>
+{% endblock %}

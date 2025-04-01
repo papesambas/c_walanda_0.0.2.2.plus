@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contrats index{% endblock %}
+
+{% block body %}
+    <h1>Contrats index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DateSignature</th>
+                <th>DateDebut</th>
+                <th>DateFin</th>
+                <th>Particularites</th>
+                <th>IsActif</th>
+                <th>TauxHoraire</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>Designation</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contrat in contrats %}
+            <tr>
+                <td>{{ contrat.id }}</td>
+                <td>{{ contrat.dateSignature ? contrat.dateSignature|date('Y-m-d') : '' }}</td>
+                <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}</td>
+                <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
+                <td>{{ contrat.particularites }}</td>
+                <td>{{ contrat.isActif ? 'Yes' : 'No' }}</td>
+                <td>{{ contrat.tauxHoraire }}</td>
+                <td>{{ contrat.createdAt ? contrat.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ contrat.updatedAt ? contrat.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ contrat.slug }}</td>
+                <td>{{ contrat.designation }}</td>
+                <td>
+                    <a href="{{ path('app_contrats_show', {'id': contrat.id}) }}">show</a>
+                    <a href="{{ path('app_contrats_edit', {'id': contrat.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="12">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_contrats_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AbsencesPersonnel index{% endblock %}
+
+{% block body %}
+    <h1>AbsencesPersonnel index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Jour</th>
+                <th>IsJustify</th>
+                <th>Motif</th>
+                <th>Heure</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for absences_personnel in absences_personnels %}
+            <tr>
+                <td>{{ absences_personnel.id }}</td>
+                <td>{{ absences_personnel.jour ? absences_personnel.jour|date('Y-m-d') : '' }}</td>
+                <td>{{ absences_personnel.isJustify ? 'Yes' : 'No' }}</td>
+                <td>{{ absences_personnel.motif }}</td>
+                <td>{{ absences_personnel.heure ? absences_personnel.heure|date('H:i:s') : '' }}</td>
+                <td>{{ absences_personnel.createdAt ? absences_personnel.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ absences_personnel.updatedAt ? absences_personnel.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ absences_personnel.slug }}</td>
+                <td>
+                    <a href="{{ path('app_absences_personnel_show', {'id': absences_personnel.id}) }}">show</a>
+                    <a href="{{ path('app_absences_personnel_edit', {'id': absences_personnel.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_absences_personnel_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}NiveauEtudes{% endblock %}
+
+{% block body %}
+    <h1>NiveauEtudes</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ niveau_etude.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ niveau_etude.designation }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ niveau_etude.slug }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ niveau_etude.createdAt ? niveau_etude.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ niveau_etude.updatedAt ? niveau_etude.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_niveau_etudes_index') }}">back to list</a>
+
+    <a href="{{ path('app_niveau_etudes_edit', {'id': niveau_etude.id}) }}">edit</a>
+
+    {{ include('niveau_etudes/_delete_form.html.twig') }}
+{% endblock %}

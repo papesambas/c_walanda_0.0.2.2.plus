@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Personnels{% endblock %}
+
+{% block body %}
+    <h1>Personnels</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ personnel.id }}</td>
+            </tr>
+            <tr>
+                <th>ImageName</th>
+                <td>{{ personnel.imageName }}</td>
+            </tr>
+            <tr>
+                <th>DateNaissance</th>
+                <td>{{ personnel.dateNaissance ? personnel.dateNaissance|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Sexe</th>
+                <td>{{ personnel.sexe }}</td>
+            </tr>
+            <tr>
+                <th>ReferenceDiplome</th>
+                <td>{{ personnel.referenceDiplome }}</td>
+            </tr>
+            <tr>
+                <th>IsActif</th>
+                <td>{{ personnel.isActif ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>IsAllowed</th>
+                <td>{{ personnel.isAllowed ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ personnel.createdAt ? personnel.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ personnel.updatedAt ? personnel.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ personnel.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_personnels_index') }}">back to list</a>
+
+    <a href="{{ path('app_personnels_edit', {'id': personnel.id}) }}">edit</a>
+
+    {{ include('personnels/_delete_form.html.twig') }}
+{% endblock %}

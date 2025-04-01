@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Specialites{% endblock %}
+
+{% block body %}
+    <h1>Specialites</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ specialite.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ specialite.designation }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ specialite.slug }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ specialite.createdAt ? specialite.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ specialite.updatedAt ? specialite.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_specialites_index') }}">back to list</a>
+
+    <a href="{{ path('app_specialites_edit', {'id': specialite.id}) }}">edit</a>
+
+    {{ include('specialites/_delete_form.html.twig') }}
+{% endblock %}

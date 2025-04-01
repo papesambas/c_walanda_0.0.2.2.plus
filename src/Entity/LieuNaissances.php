@@ -35,9 +35,16 @@ class LieuNaissances
     #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'lieuNaissance')]
     private Collection $eleves;
 
+    /**
+     * @var Collection<int, Personnels>
+     */
+    #[ORM\OneToMany(targetEntity: Personnels::class, mappedBy: 'lieuNaissance')]
+    private Collection $personnels;
+
     public function __construct()
     {
         $this->eleves = new ArrayCollection();
+        $this->personnels = new ArrayCollection();
     }
 
     public function __toString()
@@ -86,6 +93,36 @@ class LieuNaissances
             // set the owning side to null (unless already changed)
             if ($elefe->getLieuNaissance() === $this) {
                 $elefe->setLieuNaissance(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Personnels>
+     */
+    public function getPersonnels(): Collection
+    {
+        return $this->personnels;
+    }
+
+    public function addPersonnel(Personnels $personnel): static
+    {
+        if (!$this->personnels->contains($personnel)) {
+            $this->personnels->add($personnel);
+            $personnel->setLieuNaissance($this);
+        }
+
+        return $this;
+    }
+
+    public function removePersonnel(Personnels $personnel): static
+    {
+        if ($this->personnels->removeElement($personnel)) {
+            // set the owning side to null (unless already changed)
+            if ($personnel->getLieuNaissance() === $this) {
+                $personnel->setLieuNaissance(null);
             }
         }
 

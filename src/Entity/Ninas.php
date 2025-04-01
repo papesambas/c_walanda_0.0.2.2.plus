@@ -38,6 +38,9 @@ class Ninas
     #[ORM\JoinColumn(nullable: true, unique: true)] // <-- Ajoutez unique: true
     private ?Meres $mere = null;
 
+    #[ORM\OneToOne(mappedBy: 'nina', cascade: ['persist', 'remove'])]
+    private ?Personnels $personnels = null;
+
     public function __toString(): string
     {
         return $this->designation ?? '';
@@ -89,6 +92,23 @@ class Ninas
     public function setMere(?Meres $mere): static
     {
         $this->mere = $mere;
+
+        return $this;
+    }
+
+    public function getPersonnels(): ?Personnels
+    {
+        return $this->personnels;
+    }
+
+    public function setPersonnels(Personnels $personnels): static
+    {
+        // set the owning side of the relation if necessary
+        if ($personnels->getNina() !== $this) {
+            $personnels->setNina($this);
+        }
+
+        $this->personnels = $personnels;
 
         return $this;
     }

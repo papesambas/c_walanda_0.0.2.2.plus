@@ -37,6 +37,9 @@ class Telephones1
     #[ORM\OneToOne(mappedBy: 'telephone1', cascade: ['persist', 'remove'])]
     private ?Meres $meres = null;
 
+    #[ORM\OneToOne(mappedBy: 'telephone1', cascade: ['persist', 'remove'])]
+    private ?Personnels $personnels = null;
+
     public function __toString()
     {
         return $this->numero ?? '';
@@ -89,6 +92,23 @@ class Telephones1
         }
 
         $this->meres = $meres;
+
+        return $this;
+    }
+
+    public function getPersonnels(): ?Personnels
+    {
+        return $this->personnels;
+    }
+
+    public function setPersonnels(Personnels $personnels): static
+    {
+        // set the owning side of the relation if necessary
+        if ($personnels->getTelephone1() !== $this) {
+            $personnels->setTelephone1($this);
+        }
+
+        $this->personnels = $personnels;
 
         return $this;
     }

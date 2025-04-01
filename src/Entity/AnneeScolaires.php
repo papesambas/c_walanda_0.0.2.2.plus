@@ -46,11 +46,32 @@ class AnneeScolaires
     #[ORM\Column]
     private ?bool $isCurrent = false;
 
+    /**
+     * @var Collection<int, AbsencesPersonnel>
+     */
+    #[ORM\OneToMany(targetEntity: AbsencesPersonnel::class, mappedBy: 'anneeScolaire')]
+    private Collection $absencesPersonnels;
+
+    /**
+     * @var Collection<int, RetardsPersonnel>
+     */
+    #[ORM\OneToMany(targetEntity: RetardsPersonnel::class, mappedBy: 'anneeScolaire')]
+    private Collection $retardsPersonnels;
+
+    /**
+     * @var Collection<int, IndisciplinePersonnel>
+     */
+    #[ORM\OneToMany(targetEntity: IndisciplinePersonnel::class, mappedBy: 'anneeScolaire')]
+    private Collection $indisciplinePersonnels;
+
     public function __construct()
     {
         $this->retards = new ArrayCollection();
         $this->absences = new ArrayCollection();
         $this->indisciplines = new ArrayCollection();
+        $this->absencesPersonnels = new ArrayCollection();
+        $this->retardsPersonnels = new ArrayCollection();
+        $this->indisciplinePersonnels = new ArrayCollection();
     }
 
     public function __tostring()
@@ -213,6 +234,96 @@ class AnneeScolaires
     {
         $currentYear = (int) date('Y');
         return $currentYear >= $this->anneedebut && $currentYear <= $this->anneeFin;
+    }
+
+    /**
+     * @return Collection<int, AbsencesPersonnel>
+     */
+    public function getAbsencesPersonnels(): Collection
+    {
+        return $this->absencesPersonnels;
+    }
+
+    public function addAbsencesPersonnel(AbsencesPersonnel $absencesPersonnel): static
+    {
+        if (!$this->absencesPersonnels->contains($absencesPersonnel)) {
+            $this->absencesPersonnels->add($absencesPersonnel);
+            $absencesPersonnel->setAnneeScolaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbsencesPersonnel(AbsencesPersonnel $absencesPersonnel): static
+    {
+        if ($this->absencesPersonnels->removeElement($absencesPersonnel)) {
+            // set the owning side to null (unless already changed)
+            if ($absencesPersonnel->getAnneeScolaire() === $this) {
+                $absencesPersonnel->setAnneeScolaire(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RetardsPersonnel>
+     */
+    public function getRetardsPersonnels(): Collection
+    {
+        return $this->retardsPersonnels;
+    }
+
+    public function addRetardsPersonnel(RetardsPersonnel $retardsPersonnel): static
+    {
+        if (!$this->retardsPersonnels->contains($retardsPersonnel)) {
+            $this->retardsPersonnels->add($retardsPersonnel);
+            $retardsPersonnel->setAnneeScolaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetardsPersonnel(RetardsPersonnel $retardsPersonnel): static
+    {
+        if ($this->retardsPersonnels->removeElement($retardsPersonnel)) {
+            // set the owning side to null (unless already changed)
+            if ($retardsPersonnel->getAnneeScolaire() === $this) {
+                $retardsPersonnel->setAnneeScolaire(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, IndisciplinePersonnel>
+     */
+    public function getIndisciplinePersonnels(): Collection
+    {
+        return $this->indisciplinePersonnels;
+    }
+
+    public function addIndisciplinePersonnel(IndisciplinePersonnel $indisciplinePersonnel): static
+    {
+        if (!$this->indisciplinePersonnels->contains($indisciplinePersonnel)) {
+            $this->indisciplinePersonnels->add($indisciplinePersonnel);
+            $indisciplinePersonnel->setAnneeScolaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIndisciplinePersonnel(IndisciplinePersonnel $indisciplinePersonnel): static
+    {
+        if ($this->indisciplinePersonnels->removeElement($indisciplinePersonnel)) {
+            // set the owning side to null (unless already changed)
+            if ($indisciplinePersonnel->getAnneeScolaire() === $this) {
+                $indisciplinePersonnel->setAnneeScolaire(null);
+            }
+        }
+
+        return $this;
     }
     
 }

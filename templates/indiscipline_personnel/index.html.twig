@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IndisciplinePersonnel index{% endblock %}
+
+{% block body %}
+    <h1>IndisciplinePersonnel index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Jour</th>
+                <th>Description</th>
+                <th>IsSanction</th>
+                <th>Sanction</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for indiscipline_personnel in indiscipline_personnels %}
+            <tr>
+                <td>{{ indiscipline_personnel.id }}</td>
+                <td>{{ indiscipline_personnel.jour ? indiscipline_personnel.jour|date('Y-m-d') : '' }}</td>
+                <td>{{ indiscipline_personnel.description }}</td>
+                <td>{{ indiscipline_personnel.isSanction ? 'Yes' : 'No' }}</td>
+                <td>{{ indiscipline_personnel.sanction }}</td>
+                <td>{{ indiscipline_personnel.createdAt ? indiscipline_personnel.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ indiscipline_personnel.updatedAt ? indiscipline_personnel.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ indiscipline_personnel.slug }}</td>
+                <td>
+                    <a href="{{ path('app_indiscipline_personnel_show', {'id': indiscipline_personnel.id}) }}">show</a>
+                    <a href="{{ path('app_indiscipline_personnel_edit', {'id': indiscipline_personnel.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_indiscipline_personnel_new') }}">Create new</a>
+{% endblock %}

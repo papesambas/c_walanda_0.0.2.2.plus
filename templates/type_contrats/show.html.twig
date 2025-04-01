@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TypeContrats{% endblock %}
+
+{% block body %}
+    <h1>TypeContrats</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ type_contrat.id }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ type_contrat.createdAt ? type_contrat.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ type_contrat.updatedAt ? type_contrat.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ type_contrat.designation }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ type_contrat.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_type_contrats_index') }}">back to list</a>
+
+    <a href="{{ path('app_type_contrats_edit', {'id': type_contrat.id}) }}">edit</a>
+
+    {{ include('type_contrats/_delete_form.html.twig') }}
+{% endblock %}

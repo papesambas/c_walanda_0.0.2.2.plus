@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}NiveauEtudes index{% endblock %}
+
+{% block body %}
+    <h1>NiveauEtudes index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Designation</th>
+                <th>Slug</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for niveau_etude in niveau_etudes %}
+            <tr>
+                <td>{{ niveau_etude.id }}</td>
+                <td>{{ niveau_etude.designation }}</td>
+                <td>{{ niveau_etude.slug }}</td>
+                <td>{{ niveau_etude.createdAt ? niveau_etude.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ niveau_etude.updatedAt ? niveau_etude.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_niveau_etudes_show', {'id': niveau_etude.id}) }}">show</a>
+                    <a href="{{ path('app_niveau_etudes_edit', {'id': niveau_etude.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_niveau_etudes_new') }}">Create new</a>
+{% endblock %}

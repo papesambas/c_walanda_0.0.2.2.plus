@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RetardsPersonnel index{% endblock %}
+
+{% block body %}
+    <h1>RetardsPersonnel index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Jour</th>
+                <th>Heure</th>
+                <th>Duree</th>
+                <th>Motif</th>
+                <th>HeureClasse</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for retards_personnel in retards_personnels %}
+            <tr>
+                <td>{{ retards_personnel.id }}</td>
+                <td>{{ retards_personnel.jour ? retards_personnel.jour|date('Y-m-d') : '' }}</td>
+                <td>{{ retards_personnel.heure ? retards_personnel.heure|date('H:i:s') : '' }}</td>
+                <td>{{ retards_personnel.duree ? retards_personnel.duree|date('H:i:s') : '' }}</td>
+                <td>{{ retards_personnel.motif }}</td>
+                <td>{{ retards_personnel.heureClasse ? retards_personnel.heureClasse|date('H:i:s') : '' }}</td>
+                <td>{{ retards_personnel.createdAt ? retards_personnel.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ retards_personnel.updatedAt ? retards_personnel.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ retards_personnel.slug }}</td>
+                <td>
+                    <a href="{{ path('app_retards_personnel_show', {'id': retards_personnel.id}) }}">show</a>
+                    <a href="{{ path('app_retards_personnel_edit', {'id': retards_personnel.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_retards_personnel_new') }}">Create new</a>
+{% endblock %}

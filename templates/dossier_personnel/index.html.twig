@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DossierPersonnel index{% endblock %}
+
+{% block body %}
+    <h1>DossierPersonnel index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Designation</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for dossier_personnel in dossier_personnels %}
+            <tr>
+                <td>{{ dossier_personnel.id }}</td>
+                <td>{{ dossier_personnel.designation }}</td>
+                <td>{{ dossier_personnel.createdAt ? dossier_personnel.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ dossier_personnel.updatedAt ? dossier_personnel.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ dossier_personnel.slug }}</td>
+                <td>
+                    <a href="{{ path('app_dossier_personnel_show', {'id': dossier_personnel.id}) }}">show</a>
+                    <a href="{{ path('app_dossier_personnel_edit', {'id': dossier_personnel.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_dossier_personnel_new') }}">Create new</a>
+{% endblock %}

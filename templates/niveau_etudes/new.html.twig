@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New NiveauEtudes{% endblock %}
+
+{% block body %}
+    <h1>Create new NiveauEtudes</h1>
+
+    {{ include('niveau_etudes/_form.html.twig') }}
+
+    <a href="{{ path('app_niveau_etudes_index') }}">back to list</a>
+{% endblock %}

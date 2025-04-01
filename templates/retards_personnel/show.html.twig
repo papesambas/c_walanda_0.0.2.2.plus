@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RetardsPersonnel{% endblock %}
+
+{% block body %}
+    <h1>RetardsPersonnel</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ retards_personnel.id }}</td>
+            </tr>
+            <tr>
+                <th>Jour</th>
+                <td>{{ retards_personnel.jour ? retards_personnel.jour|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Heure</th>
+                <td>{{ retards_personnel.heure ? retards_personnel.heure|date('H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Duree</th>
+                <td>{{ retards_personnel.duree ? retards_personnel.duree|date('H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Motif</th>
+                <td>{{ retards_personnel.motif }}</td>
+            </tr>
+            <tr>
+                <th>HeureClasse</th>
+                <td>{{ retards_personnel.heureClasse ? retards_personnel.heureClasse|date('H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ retards_personnel.createdAt ? retards_personnel.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ retards_personnel.updatedAt ? retards_personnel.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ retards_personnel.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_retards_personnel_index') }}">back to list</a>
+
+    <a href="{{ path('app_retards_personnel_edit', {'id': retards_personnel.id}) }}">edit</a>
+
+    {{ include('retards_personnel/_delete_form.html.twig') }}
+{% endblock %}

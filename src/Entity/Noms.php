@@ -51,11 +51,18 @@ class Noms
     #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'nom')]
     private Collection $eleves;
 
+    /**
+     * @var Collection<int, Personnels>
+     */
+    #[ORM\OneToMany(targetEntity: Personnels::class, mappedBy: 'nom')]
+    private Collection $personnels;
+
     public function __construct()
     {
         $this->peres = new ArrayCollection();
         $this->meres = new ArrayCollection();
         $this->eleves = new ArrayCollection();
+        $this->personnels = new ArrayCollection();
     }
 
     public function __tostring()
@@ -173,6 +180,36 @@ class Noms
             // set the owning side to null (unless already changed)
             if ($elefe->getNom() === $this) {
                 $elefe->setNom(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Personnels>
+     */
+    public function getPersonnels(): Collection
+    {
+        return $this->personnels;
+    }
+
+    public function addPersonnel(Personnels $personnel): static
+    {
+        if (!$this->personnels->contains($personnel)) {
+            $this->personnels->add($personnel);
+            $personnel->setNom($this);
+        }
+
+        return $this;
+    }
+
+    public function removePersonnel(Personnels $personnel): static
+    {
+        if ($this->personnels->removeElement($personnel)) {
+            // set the owning side to null (unless already changed)
+            if ($personnel->getNom() === $this) {
+                $personnel->setNom(null);
             }
         }
 
