@@ -2,9 +2,13 @@ $(document).ready(function () {
     // Fonction pour gérer la case "Handicap" et le champ associé
     function isHandicapFunction() {
         let inputField = $('#eleves_natureHandicape');
+        let inputFieldRetard = $('#retards_motif');
         let checkbox = $('#eleves_isHandicap');
+        let checkboxRetard = $('#retards_isJustify');
         let message = $('#eleves_natureHandicape');
+        let motifRetard = $('#retards_motif');
         inputField.prop('required', false); // Ne pas rendre le champ obligatoire
+        inputFieldRetard.prop('required', false); // Ne pas rendre le champ obligatoire
 
         // Vérifier si les éléments existent
         if (checkbox.length && message.length) {
@@ -18,6 +22,19 @@ $(document).ready(function () {
                 }
             }).trigger('change'); // Déclencher l'événement pour initialiser l'état
         }
+
+        if (checkboxRetard.length && motifRetard.length) {
+            checkboxRetard.on('change', function () {
+                if (checkboxRetard.prop('checked')) {
+                    motifRetard.show(); // Afficher le champ
+                    inputFieldRetard.prop('required', true); // Rendre le champ obligatoire
+                } else {
+                    motifRetard.hide(); // Masquer le champ
+                    inputFieldRetard.prop('required', false); // Ne pas rendre le champ obligatoire
+                }
+            }).trigger('change'); // Déclencher l'événement pour initialiser l'état
+        }
+
     }
 
     // Fonction pour gérer la logique des cases "Actif" et "Admis"

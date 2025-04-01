@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Indiscipline index{% endblock %}
+
+{% block body %}
+    <h1>Indiscipline index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Eleve</th>
+                <th>Classe</th>
+
+                <th>Jour</th>
+                <th>Description</th>
+                <th>IsSanction</th>
+                <th>Sanction</th>
+                <th>Parents</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for indiscipline in indisciplines %}
+            <tr>
+                <td>{{ indiscipline.id }}</td>
+                <td>{{ indiscipline.eleve }}</td>
+                <td>{{ indiscipline.eleve.classe }}</td>
+                <td>{{ indiscipline.jour ? indiscipline.jour|date('Y-m-d') : '' }}</td>
+                <td>{{ indiscipline.description }}</td>
+                <td>{{ indiscipline.isSanction ? 'Yes' : 'No' }}</td>
+                <td>{{ indiscipline.sanction }}</td>
+                <td>{{ indiscipline.eleve.parent }}</td>
+                <td>
+                    <a href="{{ path('app_indiscipline_show', {'id': indiscipline.id}) }}">show</a>
+                    <a href="{{ path('app_indiscipline_edit', {'id': indiscipline.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_retards_eleves') }}">Create new</a>
+{% endblock %}

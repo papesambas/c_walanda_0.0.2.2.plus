@@ -42,7 +42,7 @@ final class DepartsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_departs_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_departs_show', methods: ['GET'])]
     public function show(Departs $depart): Response
     {
         return $this->render('departs/show.html.twig', [
@@ -50,7 +50,7 @@ final class DepartsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_departs_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_departs_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Departs $depart, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(DepartsType::class, $depart);

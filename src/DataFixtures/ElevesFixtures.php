@@ -30,12 +30,10 @@ class ElevesFixtures extends Fixture implements DependentFixtureInterface
         $classes = $this->classesRepository->findAll();
 
         if (count($statuts) !== 10) {
-            //dump($statuts);
             //throw new \Exception('Il doit y avoir exactement 10 statuts dans la base de données.');
         }
 
         if (count($classes) !== 36) {
-            //dump($statuts);
             //throw new \Exception('Il doit y avoir exactement 10 statuts dans la base de données.');
         }
 

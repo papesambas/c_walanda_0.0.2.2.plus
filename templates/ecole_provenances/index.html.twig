@@ -31,8 +31,8 @@
                 <td>{{ ecole_provenance.updatedAt ? ecole_provenance.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ ecole_provenance.slug }}</td>
                 <td>
-                    <a href="{{ path('app_ecole_provenances_show', {'id': ecole_provenance.id}) }}">show</a>
-                    <a href="{{ path('app_ecole_provenances_edit', {'id': ecole_provenance.id}) }}">edit</a>
+                    <a href="{{ path('app_ecole_provenances_show', {'slug': ecole_provenance.slug}) }}">show</a>
+                    <a href="{{ path('app_ecole_provenances_edit', {'slug': ecole_provenance.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

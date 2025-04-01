@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle année scolaire{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Créer une nouvelle année scolaire</h1>
+
+    {{ form_start(form) }}
+        <div class="card">
+            <div class="card-body">
+                {{ form_widget(form) }}
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
+                </button>
+                <button type="button" id="creerAnneePrecedente" class="btn btn-secondary">
+                    Créer une année précédente
+                </button>
+                <a href="{{ path('app_annee_scolaires_index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+            </div>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
+
+
+

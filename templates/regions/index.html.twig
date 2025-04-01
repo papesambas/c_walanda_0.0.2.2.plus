@@ -19,8 +19,8 @@
                 <td>{{ region.id }}</td>
                 <td>{{ region.designation }}</td>
                 <td>
-                    <a href="{{ path('app_regions_show', {'id': region.id}) }}">show</a>
-                    <a href="{{ path('app_regions_edit', {'id': region.id}) }}">edit</a>
+                    <a href="{{ path('app_regions_show', {'slug': region.slug}) }}">show</a>
+                    <a href="{{ path('app_regions_edit', {'slug': region.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

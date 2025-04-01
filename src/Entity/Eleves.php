@@ -108,7 +108,7 @@ class Eleves
     private ?string $statutFinance = 'P';
 
     #[ORM\ManyToOne(inversedBy: 'eleves', fetch: 'LAZY')]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id',onDelete:"CASCADE")]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id', onDelete: "CASCADE")]
 
     private ?Classes $classe = null;
 
@@ -168,17 +168,53 @@ class Eleves
     #[Assert\Valid]
     private Collection $ecoleAnDernier;
 
+    #[ORM\Column]
+    private ?int $age = null;
+
+    /**
+     * @var Collection<int, Retards>
+     */
+    #[ORM\OneToMany(targetEntity: Retards::class, mappedBy: 'eleves')]
+    private Collection $retards;
+
+    /**
+     * @var Collection<int, Absences>
+     */
+    #[ORM\OneToMany(targetEntity: Absences::class, mappedBy: 'eleve', orphanRemoval: true)]
+    private Collection $absences;
+
+    /**
+     * @var Collection<int, Indiscipline>
+     */
+    #[ORM\OneToMany(targetEntity: Indiscipline::class, mappedBy: 'eleve', orphanRemoval: true)]
+    private Collection $indisciplines;
+
     public function __construct()
     {
         $this->dossierEleves = new ArrayCollection();
         $this->departs = new ArrayCollection();
         $this->santes = new ArrayCollection();
         $this->ecoleAnDernier = new ArrayCollection();
+        $this->retards = new ArrayCollection();
+        $this->absences = new ArrayCollection();
+        $this->indisciplines = new ArrayCollection();
     }
 
     public function __toString()
     {
         return $this->fullname ?? '';
+    }
+
+    // Met à jour l'âge avant chaque persistance ou mise à jour
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateAge(): void
+    {
+        if ($this->dateNaissance) {
+            $this->age = $this->dateNaissance->diff(new \DateTimeImmutable())->y;
+        } else {
+            $this->age = null;
+        }
     }
 
     public function getId(): ?int
@@ -278,22 +314,26 @@ class Eleves
     public function setDateNaissance($dateNaissance): static
     {
         $this->dateNaissance = $dateNaissance;
+        $this->updateAge(); // Met à jour l'âge immédiatement
+        return $this;
+    }
+
+    // Getter qui retourne toujours la valeur calculée
+    public function getAge(): ?int
+    {
+        if ($this->dateNaissance) {
+            return $this->dateNaissance->diff(new \DateTimeImmutable())->y;
+        }
+        return $this->age; // Fallback si dateNaissance est null
+    }
+
+    public function setAge(int $age): static
+    {
+        $this->age = $age;
 
         return $this;
     }
 
-    public function getAge(): ?int
-    {
-        if (!$this->dateNaissance) {
-            return null;
-        }
-    
-        // Utilisation de DateTimeImmutable pour éviter tout problème
-        $now = new \DateTimeImmutable();
-    
-        return $this->dateNaissance->diff($now)->y;
-    }
-    
     public function getDateExtrait(): ?\DateTimeImmutable
     {
         return $this->dateExtrait;
@@ -449,7 +489,7 @@ class Eleves
         return $this;
     }
 
-        /**
+    /**
      * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
      * of 'UploadedFile' is injected into this setter to trigger the update. If this
      * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
@@ -680,4 +720,93 @@ class Eleves
         return $this;
     }
 
+    /**
+     * @return Collection<int, Retards>
+     */
+    public function getRetards(): Collection
+    {
+        return $this->retards;
+    }
+
+    public function addRetard(Retards $retard): static
+    {
+        if (!$this->retards->contains($retard)) {
+            $this->retards->add($retard);
+            $retard->setEleves($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetard(Retards $retard): static
+    {
+        if ($this->retards->removeElement($retard)) {
+            // set the owning side to null (unless already changed)
+            if ($retard->getEleves() === $this) {
+                $retard->setEleves(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Absences>
+     */
+    public function getAbsences(): Collection
+    {
+        return $this->absences;
+    }
+
+    public function addAbsence(Absences $absence): static
+    {
+        if (!$this->absences->contains($absence)) {
+            $this->absences->add($absence);
+            $absence->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbsence(Absences $absence): static
+    {
+        if ($this->absences->removeElement($absence)) {
+            // set the owning side to null (unless already changed)
+            if ($absence->getEleve() === $this) {
+                $absence->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Indiscipline>
+     */
+    public function getIndisciplines(): Collection
+    {
+        return $this->indisciplines;
+    }
+
+    public function addIndiscipline(Indiscipline $indiscipline): static
+    {
+        if (!$this->indisciplines->contains($indiscipline)) {
+            $this->indisciplines->add($indiscipline);
+            $indiscipline->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIndiscipline(Indiscipline $indiscipline): static
+    {
+        if ($this->indisciplines->removeElement($indiscipline)) {
+            // set the owning side to null (unless already changed)
+            if ($indiscipline->getEleve() === $this) {
+                $indiscipline->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
 }

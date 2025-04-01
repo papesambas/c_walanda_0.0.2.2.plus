@@ -19,8 +19,8 @@
                 <td>{{ commune.id }}</td>
                 <td>{{ commune.designation }}</td>
                 <td>
-                    <a href="{{ path('app_communes_show', {'id': commune.id}) }}">show</a>
-                    <a href="{{ path('app_communes_edit', {'id': commune.id}) }}">edit</a>
+                    <a href="{{ path('app_communes_show', {'slug': commune.slug}) }}">show</a>
+                    <a href="{{ path('app_communes_edit', {'slug': commune.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

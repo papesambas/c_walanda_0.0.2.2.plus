@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Année scolaire {{ annee_scolaire }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2>Année scolaire {{ annee_scolaire }}</h2>
+            {% if annee_scolaire.isCurrent %}
+                <span class="badge bg-success">Année courante</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Année de début</dt>
+                <dd class="col-sm-9">{{ annee_scolaire.anneedebut }}</dd>
+
+                <dt class="col-sm-3">Année de fin</dt>
+                <dd class="col-sm-9">{{ annee_scolaire.anneeFin }}</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <div class="btn-group" role="group">
+                <a href="{{ path('app_annee_scolaires_edit', {'id': annee_scolaire.id}) }}" 
+                   class="btn btn-outline-primary">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <a href="{{ path('app_annee_scolaires_index') }}" 
+                   class="btn btn-outline-secondary">
+                    <i class="fas fa-list"></i> Retour à la liste
+                </a>
+                {% if not annee_scolaire.isCurrent %}
+                <form method="post" action="{{ path('app_annee_scolaires_set_current', {'id': annee_scolaire.id}) }}" class="d-inline">
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="fas fa-check-circle"></i> Définir comme année courante
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

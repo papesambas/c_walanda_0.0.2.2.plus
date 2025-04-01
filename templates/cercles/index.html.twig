@@ -19,8 +19,8 @@
                 <td>{{ cercle.id }}</td>
                 <td>{{ cercle.designation }}</td>
                 <td>
-                    <a href="{{ path('app_cercles_show', {'id': cercle.id}) }}">show</a>
-                    <a href="{{ path('app_cercles_edit', {'id': cercle.id}) }}">edit</a>
+                    <a href="{{ path('app_cercles_show', {'slug': cercle.slug}) }}">show</a>
+                    <a href="{{ path('app_cercles_edit', {'slug': cercle.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

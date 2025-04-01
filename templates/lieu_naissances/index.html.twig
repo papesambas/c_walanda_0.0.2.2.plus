@@ -19,8 +19,8 @@
                 <td>{{ lieu_naissance.id }}</td>
                 <td>{{ lieu_naissance.designation }}</td>
                 <td>
-                    <a href="{{ path('app_lieu_naissances_show', {'id': lieu_naissance.id}) }}">show</a>
-                    <a href="{{ path('app_lieu_naissances_edit', {'id': lieu_naissance.id}) }}">edit</a>
+                    <a href="{{ path('app_lieu_naissances_show', {'slug': lieu_naissance.slug}) }}">show</a>
+                    <a href="{{ path('app_lieu_naissances_edit', {'slug': lieu_naissance.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

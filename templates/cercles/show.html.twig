@@ -20,7 +20,7 @@
 
     <a href="{{ path('app_cercles_index') }}">back to list</a>
 
-    <a href="{{ path('app_cercles_edit', {'id': cercle.id}) }}">edit</a>
+    <a href="{{ path('app_cercles_edit', {'slug': cercle.slug}) }}">edit</a>
 
     {{ include('cercles/_delete_form.html.twig') }}
 {% endblock %}

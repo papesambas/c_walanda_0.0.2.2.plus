@@ -44,7 +44,7 @@
 
     <a href="{{ path('app_ecole_provenances_index') }}">back to list</a>
 
-    <a href="{{ path('app_ecole_provenances_edit', {'id': ecole_provenance.id}) }}">edit</a>
+    <a href="{{ path('app_ecole_provenances_edit', {'slug': ecole_provenance.slug}) }}">edit</a>
 
     {{ include('ecole_provenances/_delete_form.html.twig') }}
 {% endblock %}

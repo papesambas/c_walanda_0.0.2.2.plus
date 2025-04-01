@@ -19,8 +19,8 @@
                 <td>{{ nina.id }}</td>
                 <td>{{ nina.designation }}</td>
                 <td>
-                    <a href="{{ path('app_ninas_show', {'id': nina.id}) }}">show</a>
-                    <a href="{{ path('app_ninas_edit', {'id': nina.id}) }}">edit</a>
+                    <a href="{{ path('app_ninas_show', {'slug': nina.slug}) }}">show</a>
+                    <a href="{{ path('app_ninas_edit', {'slug': nina.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

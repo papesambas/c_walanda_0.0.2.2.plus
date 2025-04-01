@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Users;
 use App\Entity\Eleves;
+use App\Entity\Statuts;
 use App\Form\ElevesType;
 use Psr\Log\LoggerInterface;
 use App\Entity\DossierEleves;
+use App\Data\SearchElevesData;
+use App\Form\SearchElevesDataType;
 use App\Repository\ElevesRepository;
 use App\Repository\CerclesRepository;
 use App\Repository\ClassesRepository;
@@ -31,6 +34,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+
 #[Route('/eleves')]
 final class ElevesController extends AbstractController
 {
@@ -40,10 +44,23 @@ final class ElevesController extends AbstractController
     }
 
     #[Route(name: 'app_eleves_index', methods: ['GET'])]
-    public function index(ElevesRepository $elevesRepository): Response
+    public function index(Request $request, ElevesRepository $elevesRepository): Response
     {
+        $data = new SearchElevesData();
+        $form = $this->createForm(SearchElevesDataType::class, $data);
+        $form->handleRequest($request);
+        // Si le formulaire est soumis et valide, on effectue la recherche
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Recherche des élèves selon les critères
+            $eleves = $elevesRepository->findBySearchCriteria($data);
+        } else {
+            // Sinon on récupère tous les élèves
+            $eleves = $elevesRepository->findAll();
+        }
+
         return $this->render('eleves/index.html.twig', [
-            'eleves' => $elevesRepository->findAll(),
+            'eleves' => $eleves,
+            'form' => $form->createView(),  // Vue du formulaire pour filtrer les résultats
         ]);
     }
 
@@ -150,7 +167,7 @@ final class ElevesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_eleves_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_eleves_show', methods: ['GET'])]
     public function show(Eleves $elefe): Response
     {
         return $this->render('eleves/show.html.twig', [
@@ -158,7 +175,7 @@ final class ElevesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_eleves_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_eleves_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Eleves $elefe,
@@ -183,55 +200,55 @@ final class ElevesController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             //try {
-                $documents = $form->get('document')->getData();
-                //$extrait = $form->get('extrait')->getData();
-                foreach ($documents as $document) {
-                    $originalFilename = pathinfo($document->getClientOriginalName(), PATHINFO_FILENAME);
-                    $safeFilename = $slugger->slug($originalFilename);
-                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $document->guessExtension();
-                    $fichier = md5(uniqid()) . '.' . $document->guessExtension();
+            $documents = $form->get('document')->getData();
+            //$extrait = $form->get('extrait')->getData();
+            foreach ($documents as $document) {
+                $originalFilename = pathinfo($document->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $document->guessExtension();
+                $fichier = md5(uniqid()) . '.' . $document->guessExtension();
 
-                    //On copie le fichier dans le dossier upload
-                    $document->move(
-                        $this->getParameter('documents_eleves_directory'),
-                        $originalFilename
-                    );
+                //On copie le fichier dans le dossier upload
+                $document->move(
+                    $this->getParameter('documents_eleves_directory'),
+                    $originalFilename
+                );
 
-                    //On stock le nom du document dans la base de donnée
-                    $docum = new DossierEleves;
-                    $docum->setDesignation($originalFilename);
-                    $docum->setSlug($fichier);
-                    $elefe->addDossierElefe($docum);
-                }
+                //On stock le nom du document dans la base de donnée
+                $docum = new DossierEleves;
+                $docum->setDesignation($originalFilename);
+                $docum->setSlug($fichier);
+                $elefe->addDossierElefe($docum);
+            }
 
-                $user = $elefe->getUsers();
-                if (!$user) {
-                    $suffix = substr(time(), -4);
+            $user = $elefe->getUsers();
+            if (!$user) {
+                $suffix = substr(time(), -4);
 
-                    $user = new Users();
-                    $password = 'password';
-                    $email = "inscription@EMPT.edu";
-                    $userNom = $elefe->getNom();
-                    $userPrenom = $elefe->getPrenom();
-                    $userFullname = $elefe->getNom() . ' ' . $elefe->getPrenom();
-                    $username = $elefe->getNom() . ' ' . $elefe->getPrenom() . $suffix;
-                    $user->setEmail($email);
-                    $user->setFullname($userFullname);
-                    $user->setNom($userNom);
-                    $user->setPrenom($userPrenom);
-                    $user->setPassword($PasswordHasher->hashPassword($user, $password));
-                    $user->setUsername($username);
-                    $user->setRoles(['ROLE_ELEVE']);
-                    $entityManager->persist($user);
-                    $entityManager->flush();
-
-                    $elefe->setUsers($user);
-                    $user->setEleve($elefe);
-                }
-
+                $user = new Users();
+                $password = 'password';
+                $email = "inscription@EMPT.edu";
+                $userNom = $elefe->getNom();
+                $userPrenom = $elefe->getPrenom();
+                $userFullname = $elefe->getNom() . ' ' . $elefe->getPrenom();
+                $username = $elefe->getNom() . ' ' . $elefe->getPrenom() . $suffix;
+                $user->setEmail($email);
+                $user->setFullname($userFullname);
+                $user->setNom($userNom);
+                $user->setPrenom($userPrenom);
+                $user->setPassword($PasswordHasher->hashPassword($user, $password));
+                $user->setUsername($username);
+                $user->setRoles(['ROLE_ELEVE']);
+                $entityManager->persist($user);
                 $entityManager->flush();
 
-                return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
+                $elefe->setUsers($user);
+                $user->setEleve($elefe);
+            }
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_eleves_index', [], Response::HTTP_SEE_OTHER);
             /*} catch (\Exception $e) {
                 // Journalisation de l'erreur
                 $this->addFlash('error', 'Une erreur s\'est produite lors de l\'enregistrement des modifications.');
@@ -243,7 +260,7 @@ final class ElevesController extends AbstractController
         return $this->render('eleves/edit.html.twig', [
             'elefe' => $elefe,
             'form' => $form,
-            'age'=> $elefe->getAge(),
+            'age' => $elefe->getAge(),
         ]);
     }
 

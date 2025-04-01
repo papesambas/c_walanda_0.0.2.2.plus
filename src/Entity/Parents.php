@@ -43,7 +43,7 @@ class Parents
 
     public function __tostring()
     {
-        return $this->pere.' '.$this->mere ?? '';
+        return $this->pere.' & '.$this->mere ?? '';
     }
 
     public function getId(): ?int

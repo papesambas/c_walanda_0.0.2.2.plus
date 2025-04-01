@@ -20,7 +20,7 @@
 
     <a href="{{ path('app_telephones2_index') }}">back to list</a>
 
-    <a href="{{ path('app_telephones2_edit', {'id': telephones2.id}) }}">edit</a>
+    <a href="{{ path('app_telephones2_edit', {'slug': telephones2.slug}) }}">edit</a>
 
     {{ include('telephones2/_delete_form.html.twig') }}
 {% endblock %}

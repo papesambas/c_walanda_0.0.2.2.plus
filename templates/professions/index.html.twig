@@ -19,8 +19,8 @@
                 <td>{{ profession.id }}</td>
                 <td>{{ profession.designation }}</td>
                 <td>
-                    <a href="{{ path('app_professions_show', {'id': profession.id}) }}">show</a>
-                    <a href="{{ path('app_professions_edit', {'id': profession.id}) }}">edit</a>
+                    <a href="{{ path('app_professions_show', {'slug': profession.slug}) }}">show</a>
+                    <a href="{{ path('app_professions_edit', {'slug': profession.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

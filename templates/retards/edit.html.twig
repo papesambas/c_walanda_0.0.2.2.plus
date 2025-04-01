@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Retards{% endblock %}
+
+{% block body %}
+    <h1>Edit Retards</h1>
+
+    {{ include('retards/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_retards_index') }}">back to list</a>
+
+    {{ include('retards/_delete_form.html.twig') }}
+{% endblock %}

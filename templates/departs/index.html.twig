@@ -21,8 +21,8 @@
                 <td>{{ depart.dateDepart ? depart.dateDepart|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ depart.ecoleDestination }}</td>
                 <td>
-                    <a href="{{ path('app_departs_show', {'id': depart.id}) }}">show</a>
-                    <a href="{{ path('app_departs_edit', {'id': depart.id}) }}">edit</a>
+                    <a href="{{ path('app_departs_show', {'slug': depart.slug}) }}">show</a>
+                    <a href="{{ path('app_departs_edit', {'slug': depart.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

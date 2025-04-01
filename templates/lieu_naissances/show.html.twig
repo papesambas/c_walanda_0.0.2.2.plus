@@ -20,7 +20,7 @@
 
     <a href="{{ path('app_lieu_naissances_index') }}">back to list</a>
 
-    <a href="{{ path('app_lieu_naissances_edit', {'id': lieu_naissance.id}) }}">edit</a>
+    <a href="{{ path('app_lieu_naissances_edit', {'slug': lieu_naissance.slug}) }}">edit</a>
 
     {{ include('lieu_naissances/_delete_form.html.twig') }}
 {% endblock %}

@@ -32,7 +32,7 @@
 
     <a href="{{ path('app_santes_index') }}">back to list</a>
 
-    <a href="{{ path('app_santes_edit', {'id': sante.id}) }}">edit</a>
+    <a href="{{ path('app_santes_edit', {'slug': sante.slug}) }}">edit</a>
 
     {{ include('santes/_delete_form.html.twig') }}
 {% endblock %}

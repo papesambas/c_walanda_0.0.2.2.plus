@@ -42,7 +42,7 @@ final class ProfessionsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_professions_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_professions_show', methods: ['GET'])]
     public function show(Professions $profession): Response
     {
         return $this->render('professions/show.html.twig', [
@@ -50,7 +50,7 @@ final class ProfessionsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_professions_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_professions_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Professions $profession, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ProfessionsType::class, $profession);

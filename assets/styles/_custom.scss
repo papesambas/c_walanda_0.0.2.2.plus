@@ -198,3 +198,12 @@ form button:hover {
     90% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-20px); }
 }
+
+.search-form .form-control-sm {
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+}
+
+.input-group-text {
+    font-size: 0.875rem;
+}

@@ -42,7 +42,7 @@ final class NomsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_noms_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_noms_show', methods: ['GET'])]
     public function show(Noms $nom): Response
     {
         return $this->render('noms/show.html.twig', [
@@ -50,7 +50,7 @@ final class NomsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_noms_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_noms_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Noms $nom, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(NomsType::class, $nom);

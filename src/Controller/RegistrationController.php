@@ -90,7 +90,7 @@ class RegistrationController extends AbstractController
         return $this->redirectToRoute('app_home');
     }
 
-    #[Route('/reverify/email/{id}', name: 'app_reverify_email')]
+    #[Route('/reverify/email/{slug}', name: 'app_reverify_email')]
     public function reverifyUserEmail(Request $request, Users $user): Response
     {
 

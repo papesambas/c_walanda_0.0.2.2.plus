@@ -50,7 +50,7 @@ final class Scolarites2Controller extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_scolarites2_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_scolarites2_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Scolarites2 $scolarites2, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(Scolarites2Type::class, $scolarites2);

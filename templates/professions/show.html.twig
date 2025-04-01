@@ -20,7 +20,7 @@
 
     <a href="{{ path('app_professions_index') }}">back to list</a>
 
-    <a href="{{ path('app_professions_edit', {'id': profession.id}) }}">edit</a>
+    <a href="{{ path('app_professions_edit', {'slug': profession.slug}) }}">edit</a>
 
     {{ include('professions/_delete_form.html.twig') }}
 {% endblock %}

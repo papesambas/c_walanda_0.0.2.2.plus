@@ -42,7 +42,7 @@ final class Telephones2Controller extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_telephones2_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_telephones2_show', methods: ['GET'])]
     public function show(Telephones2 $telephones2): Response
     {
         return $this->render('telephones2/show.html.twig', [
@@ -50,7 +50,7 @@ final class Telephones2Controller extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_telephones2_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_telephones2_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Telephones2 $telephones2, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(Telephones2Type::class, $telephones2);

@@ -25,8 +25,8 @@
                 <td>{{ sante.numeroUrgence }}</td>
                 <td>{{ sante.centreSante }}</td>
                 <td>
-                    <a href="{{ path('app_santes_show', {'id': sante.id}) }}">show</a>
-                    <a href="{{ path('app_santes_edit', {'id': sante.id}) }}">edit</a>
+                    <a href="{{ path('app_santes_show', {'slug': sante.slug}) }}">show</a>
+                    <a href="{{ path('app_santes_edit', {'slug': sante.slug}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

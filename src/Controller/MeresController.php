@@ -6,7 +6,10 @@ use App\Entity\Meres;
 use App\Form\MeresType;
 use App\Data\SearchData;
 use App\Form\SearchDataType;
+use App\Data\SearchElevesData;
+use App\Form\SearchElevesDataType;
 use App\Repository\MeresRepository;
+use App\Repository\ElevesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,15 +62,69 @@ final class MeresController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_meres_show', methods: ['GET'])]
-    public function show(Meres $mere): Response
+    #[Route('/{slug}', name: 'app_meres_show', methods: ['GET'])]
+    public function show(Meres $mere,ElevesRepository $elevesRepository, Request $request): Response
     {
-        return $this->render('meres/show.html.twig', [
+        // Création de l'objet de recherche
+        $searchData = new SearchElevesData();
+        $form = $this->createForm(SearchElevesDataType::class, $searchData);
+        $form->handleRequest($request);
+
+        // Requête de base filtrée par lieu de naissance
+        $queryBuilder = $elevesRepository->createQueryBuilder('e')
+        ->leftjoin('e.parent', 'pa')  // Jointure avec LieuNaissance
+        ->andWhere('pa.mere = :mere')   // Filtrer sur le nom de la commune
+        ->setParameter('mere', $mere)
+        ->orderBy('e.fullname', 'ASC');
+
+        // Application des filtres supplémentaires si formulaire soumis
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!empty($searchData->q)) {
+                $queryBuilder->andWhere('e.fullname LIKE :q')
+                    ->setParameter('q', '%' . $searchData->q . '%');
+            }
+
+            if ($searchData->age1 !== null) {
+                $queryBuilder->andWhere('e.age >= :age1')
+                    ->setParameter('age1', $searchData->age1);
+            }
+
+            if ($searchData->age2 !== null) {
+                $queryBuilder->andWhere('e.age <= :age2')
+                    ->setParameter('age2', $searchData->age2);
+            }
+
+            if (!$searchData->statut->isEmpty()) {
+                $designations = $searchData->statut->map(function ($statut) {
+                    return $statut->getDesignation();
+                })->toArray();
+
+                $queryBuilder
+                    ->leftJoin('e.statut', 's')
+                    ->andWhere('s.designation IN (:statuts)')
+                    ->setParameter('statuts', $designations);
+            }
+
+            if (!$searchData->classe->isEmpty()) {
+                $queryBuilder->andWhere('e.classe IN (:classes)')
+                    ->setParameter('classes', $searchData->classe);
+            }
+        }
+
+        // Exécution de la requête
+        $eleves = $queryBuilder
+            ->orderBy('e.fullname', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('eleves/index.html.twig', [
+            'eleves' => $eleves,
             'mere' => $mere,
-        ]);
+            'form' => $form->createView()
+        ]); 
     }
 
-    #[Route('/{id}/edit', name: 'app_meres_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_meres_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Meres $mere, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(MeresType::class, $mere);

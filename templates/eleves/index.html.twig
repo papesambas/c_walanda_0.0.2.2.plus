@@ -3,7 +3,71 @@
 {% block title %}Eleves index{% endblock %}
 
 {% block body %}
-<h3 class="text-primary fw-bold border-bottom pb-2">📚 Élèves - Index</h3>
+<div class="row align-items-center mb-4">
+    <!-- Titre -->
+    <div class="col-md-3 col-12">
+        <h3 class="text-primary fw-bold mb-0">📚 Élèves - Index</h3>
+    </div>
+
+    <!-- Formulaire de recherche -->
+    <div class="col-md-9 col-12 align-items-center">
+        {{ form_start(form, {'attr': {'class': 'bg-light p-3 rounded'}}) }}
+        <div class="row g-2 align-items-end">
+            <!-- Champ texte -->
+            <div class="col-lg-3 col-md-6">
+                {{ form_row(form.q, {
+                    'attr': {
+                        'placeholder': 'Nom, prénom...',
+                        'class': 'form-control'
+                    },
+                    'label': 'Recherche'
+                }) }}
+            </div>
+
+            <!-- Plage d'âge -->
+            <div class="col-lg-2 col-md-4">
+                <div class="input-group">
+                    {{ form_widget(form.age1, {'attr': {'placeholder': 'Âge min', 'class': 'form-control'}}) }}
+                    <span class="input-group-text bg-white">à</span>
+                    {{ form_widget(form.age2, {'attr': {'placeholder': 'Âge max', 'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <!-- Statut -->
+            <div class="col-lg-2 col-md-4">
+                {{ form_row(form.statut, {
+                    'attr': {'class': 'form-select select-statut'},
+                    'label': 'Statut'
+                }) }}
+            </div>
+
+            <!-- Classe -->
+            <div class="col-lg-3 col-md-4">
+                {{ form_row(form.classe, {
+                    'attr': {'class': 'form-select select-classe'},
+                    'label': 'Classe'
+                }) }}
+            </div>
+
+            <!-- Boutons -->
+            <div class="col-lg-1 col-md-4 d-flex gap-1 justify-content-end">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="fas fa-search me-1"></i> 
+                </button>
+                <button type="button"
+                    onclick="if(confirm('Voulez-vous vraiment réinitialiser tous les filtres ?')) window.location.href='{{ path('app_eleves_index') }}'"
+                    class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-undo me-1"></i> 
+                </button>
+                {#<a href="{{ path('app_eleves_index') }}" class="btn btn-sm btn-secondary w-100">
+                    <i class="fas fa-undo me-1"></i> 
+                </a>#}
+            </div>
+        </div>
+        {{ form_end(form, {'render_rest': false}) }}
+    </div>
+</div>
+
 {% set route = app.request.attributes.get('_route') %}
 <div class="card">
     <div class="card-body">
@@ -17,13 +81,16 @@
                         <th>Sexe</th>
                         <th>Né(e) le ..</th>
                         <th>Age</th>
-                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route ==
+                        'app_cercles_show' or route == 'app_regions_show' %}
                         <th>Région de ...</th>
                         {% endif %}
-                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route ==
+                        'app_cercles_show' or route == 'app_regions_show' %}
                         <th>Cercle de ...</th>
                         {% endif %}
-                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route ==
+                        'app_cercles_show' or route == 'app_regions_show' %}
                         <th>Commune de ...</th>
                         {% endif %}
 
@@ -32,11 +99,15 @@
                         <th>NumeroExtrait</th>#}
                         <th>Statut</th>
                         <th>Classe</th>
-                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
-                        <th>Ecole An dernier ..</th>
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route !=
+                        'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route ==
+                        'app_eleves_index' %}
+                        <th>Ecole Recrutement ..</th>
                         {% endif %}
-                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
-                        <th>Ecole Recrutement</th>
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route !=
+                        'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route ==
+                        'app_eleves_index' %}
+                        <th>Ecole An dernier</th>
                         {% endif %}
 
                         <th>actions</th>
@@ -59,48 +130,72 @@
                         <td><a class="text-black text-decoration-none" href="">{{ elefe.sexe }}</a></td>
                         <td><a class="text-black text-decoration-none"
                                 href="">{{ elefe.dateNaissance ? elefe.dateNaissance|date('d-m-Y') : '' }}</a></td>
-                        <td><a class="text-black text-decoration-none" href="">{{ "%02d"|format(elefe.age) }} ans</a></td>
-                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
-                        <td><a class="text-black text-decoration-none" href="{{ path('app_regions_show', {'slug': elefe.lieuNaissance.commune.cercle.region.slug}) }}">{{ elefe.lieuNaissance.commune.cercle.region }}</a></td>
+                        <td><a class="text-black text-decoration-none" href="">{{ "%02d"|format(elefe.age) }} ans</a>
+                        </td>
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route ==
+                        'app_cercles_show' or route == 'app_regions_show' %}
+                        <td><a class="text-black text-decoration-none"
+                                href="{{ path('app_regions_show', {'slug': elefe.lieuNaissance.commune.cercle.region.slug}) }}">{{ elefe.lieuNaissance.commune.cercle.region }}</a>
+                        </td>
                         {% endif %}
-                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show'  or route == 'app_cercles_show' or route == 'app_regions_show' %}
-                        <td><a class="text-black text-decoration-none" href="{{ path('app_cercles_show', {'slug': elefe.lieuNaissance.commune.cercle.slug}) }}">{{ elefe.lieuNaissance.commune.cercle }}</a></td>
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route ==
+                        'app_cercles_show' or route == 'app_regions_show' %}
+                        <td><a class="text-black text-decoration-none"
+                                href="{{ path('app_cercles_show', {'slug': elefe.lieuNaissance.commune.cercle.slug}) }}">{{ elefe.lieuNaissance.commune.cercle }}</a>
+                        </td>
                         {% endif %}
-                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route == 'app_cercles_show' or route == 'app_regions_show'  %}
-                        <td><a class="text-black text-decoration-none" href="{{ path('app_communes_show', {'slug': elefe.lieuNaissance.commune.slug}) }}">{{ elefe.lieuNaissance.commune }}</a></td>
+                        {% if route == 'app_lieu_naissances_show' or route == 'app_communes_show' or route ==
+                        'app_cercles_show' or route == 'app_regions_show' %}
+                        <td><a class="text-black text-decoration-none"
+                                href="{{ path('app_communes_show', {'slug': elefe.lieuNaissance.commune.slug}) }}">{{ elefe.lieuNaissance.commune }}</a>
+                        </td>
                         {% endif %}
-                        <td><a class="text-black text-decoration-none" href="{{ path('app_lieu_naissances_show', {'slug': elefe.lieuNaissance.slug}) }}">{{ elefe.lieuNaissance }}</a></td>
+                        <td><a class="text-black text-decoration-none"
+                                href="{{ path('app_lieu_naissances_show', {'slug': elefe.lieuNaissance.slug}) }}">{{ elefe.lieuNaissance }}</a>
+                        </td>
                         {#<td><a class="text-black text-decoration-none"
                                 href="">{{ elefe.dateExtrait ? elefe.dateExtrait|date('d-m-Y') : '' }}</a></td>
                         <td><a class="text-black text-decoration-none" href="">{{ elefe.numeroExtrait }}</a></td>#}
-                        <td><a class="text-black text-decoration-none" href="">{{ elefe.statut }}</a></td>
-                        <td><a class="text-black text-decoration-none" href="">{{ elefe.classe }}</a></td>
+                        <td><a class="text-black text-decoration-none"
+                                href="{{ path('app_statuts_show', {'slug': elefe.statut.slug}) }}">{{ elefe.statut }}</a>
+                        </td>
+                        <td><a class="text-black text-decoration-none" href="{{ path('app_classes_show', {'slug': elefe.classe.slug}) }}">{{ elefe.classe }}</a></td>
                         {#<td><a class="text-black text-decoration-none"
                                 href="">{{ elefe.dateInscription ? elefe.dateInscription|date('d-m-Y') : '' }}</a></td>
                         <td><a class="text-black text-decoration-none"
                                 href="">{{ elefe.dateRecrutement ? elefe.dateRecrutement|date('d-m-Y') : '' }}</a></td>
                         #}
-                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
-                        <td><a class="text-black text-decoration-none" href="">{{ elefe.ecoleRecrutement }}</a></td>
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route !=
+                        'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route ==
+                        'app_eleves_index' %}
+                        <td><a class="text-black text-decoration-none"
+                                href="{{ path('app_ecole_recrutement_show', {'slug': elefe.ecoleRecrutement.slug}) }}">{{ elefe.ecoleRecrutement }}</a>
+                        </td>
                         {% endif %}
-                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route != 'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route == 'app_eleves_index' %}
-                        <td><a class="text-black text-decoration-none" href="">
-                                {% if elefe.ecoleAnDernier|length > 0 %}
-                                {{ elefe.ecoleAnDernier|last.designation }}
-                                {% else %}
-                                Aucune école
-                                {% endif %}
-                            </a></td>
+                        {% if route != 'app_classes_show' and route != 'app_lieu_naissances_show' and route !=
+                        'app_communes_show' and route != 'app_cercles_show' and route != 'app_regions_show' or route ==
+                        'app_eleves_index' %}
+                        {% for ecole in elefe.ecoleAnDernier %}
+                        <td>
+                            <a class="text-black text-decoration-none"
+                                href="{{ path('app_ecole_an_dernier_show', {'slug': ecole.slug}) }}">
+                                {{ ecole.designation }}
+                            </a>
+                        </td>
+                        {% else %}
+                        <td>Aucune école</td>
+                        {% endfor %}
+
                         {% endif %}
                         {#<td>
                         <td>{{ elefe.isActif ? 'Yes' : 'No' }}</td>
                         <td>{{ elefe.isAllowed ? 'Yes' : 'No' }}</td>
                         <td>{{ elefe.isAdmis ? 'Yes' : 'No' }}</td>#}
                         <td>
-                            <a href="{{ path('app_eleves_show', {'id': elefe.id}) }}" class="btn btn-info btn-sm">
+                            <a href="{{ path('app_eleves_show', {'slug': elefe.slug}) }}" class="btn btn-info btn-sm">
                                 <i class="fas fa-eye"></i> Voir
                             </a>
-                            <a href="{{ path('app_eleves_edit', {'id': elefe.id}) }}" class="btn btn-warning btn-sm">
+                            <a href="{{ path('app_eleves_edit', {'slug': elefe.slug}) }}" class="btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i> Modifier
                             </a>
                         </td>

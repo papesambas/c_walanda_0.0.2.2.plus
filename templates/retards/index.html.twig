@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Retards index{% endblock %}
+
+{% block body %}
+    <h1>Retards index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Elève</th>
+                <th>Classe</th>
+                <th>Jour</th>
+                <th>Heure</th>
+                <th>Duree</th>
+                <th>IsJustify</th>
+                <th>Motif</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for retard in retards %}
+            <tr>
+                <td>{{ retard.id }}</td>
+                <td>{{ retard.eleves }}</td>
+                <td>{{ retard.eleves.classe }}</td>
+                <td>{{ retard.jour ? retard.jour|date('d-m-Y') : '' }}</td>
+                <td>{{ retard.heure ? retard.heure|date('H:i:s') : '' }}</td>
+                <td>{{ retard.duree ? retard.duree|date('H:i:s') : '' }}</td>
+                <td>{{ retard.isJustify ? 'Yes' : 'No' }}</td>
+                <td>{{ retard.motif }}</td>
+                <td>
+                    <a href="{{ path('app_retards_show', {'id': retard.id}) }}">show</a>
+                    <a href="{{ path('app_retards_edit', {'id': retard.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_retards_eleves') }}">Retour</a>
+{% endblock %}

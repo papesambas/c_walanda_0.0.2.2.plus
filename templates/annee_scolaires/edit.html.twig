@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit AnneeScolaires{% endblock %}
+
+{% block body %}
+    <h1>Edit AnneeScolaires</h1>
+
+    {{ include('annee_scolaires/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_annee_scolaires_index') }}">back to list</a>
+    <a href="{{ path('app_annee_scolaires_show', {'id': annee_scolaire.id}) }}" 
+                   class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+
+    {{ include('annee_scolaires/_delete_form.html.twig') }}
+{% endblock %}

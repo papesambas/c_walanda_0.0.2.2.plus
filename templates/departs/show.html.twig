@@ -24,7 +24,7 @@
 
     <a href="{{ path('app_departs_index') }}">back to list</a>
 
-    <a href="{{ path('app_departs_edit', {'id': depart.id}) }}">edit</a>
+    <a href="{{ path('app_departs_edit', {'slug': depart.slug}) }}">edit</a>
 
     {{ include('departs/_delete_form.html.twig') }}
 {% endblock %}

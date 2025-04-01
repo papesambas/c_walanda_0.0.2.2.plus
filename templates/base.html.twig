@@ -12,6 +12,7 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         {% block stylesheets %}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link rel="stylesheet" href="{{ asset('styles/app.scss') }}">
         {% endblock %}
 
@@ -26,7 +27,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             <div class="alert-message">
                 <strong class="fst-italic">Votre compte n'est pas activé</strong>,
-                <a href="{{ path('app_reverify_email', {'id': app.user.id}) }}" class="fst-italic fw-bolder">
+                <a href="{{ path('app_reverify_email', {'slug': app.user.slug}) }}" class="fst-italic fw-bolder">
                     <span class="text-muted">renvoyer le lien d'activation</span>
                 </a>
             </div>

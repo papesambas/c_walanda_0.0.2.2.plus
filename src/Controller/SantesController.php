@@ -42,7 +42,7 @@ final class SantesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_santes_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_santes_show', methods: ['GET'])]
     public function show(Santes $sante): Response
     {
         return $this->render('santes/show.html.twig', [
@@ -50,7 +50,7 @@ final class SantesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_santes_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_santes_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Santes $sante, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(SantesType::class, $sante);

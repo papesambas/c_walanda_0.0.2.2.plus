@@ -166,6 +166,18 @@ services:
             tags:
                 - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Scolarites2'}
                 - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Scolarites2'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\retardsEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Retards'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Retards'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\absencesEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Absences'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Absences'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\indisciplinesEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Indiscipline'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Indiscipline'}    # add more service definitions when explicit configuration is needed
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

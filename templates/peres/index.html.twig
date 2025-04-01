@@ -41,8 +41,8 @@
                                     <td>{{ pere.telephone1 }}</td>
                                     <td>{{ pere.telephone2 }}</td>
                                     <td>
-                                        <a href="{{ path('app_peres_show', {'id': pere.id}) }}" class="btn btn-info btn-sm">Voir</a>
-                                        <a href="{{ path('app_peres_edit', {'id': pere.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                        <a href="{{ path('app_peres_show', {'slug': pere.slug}) }}" class="btn btn-info btn-sm">Voir</a>
+                                        <a href="{{ path('app_peres_edit', {'slug': pere.slug}) }}" class="btn btn-warning btn-sm">Modifier</a>
                                     </td>
                                 </tr>
                                 {% else %}

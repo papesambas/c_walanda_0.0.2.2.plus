@@ -16,7 +16,7 @@
 
     <a href="{{ path('app_parents_index') }}">back to list</a>
 
-    <a href="{{ path('app_parents_edit', {'id': parent.id}) }}">edit</a>
+    <a href="{{ path('app_parents_edit', {'slug': parent.slug}) }}">edit</a>
 
     {{ include('parents/_delete_form.html.twig') }}
 {% endblock %}

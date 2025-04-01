@@ -42,7 +42,7 @@ final class NinasController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_ninas_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_ninas_show', methods: ['GET'])]
     public function show(Ninas $nina): Response
     {
         return $this->render('ninas/show.html.twig', [
@@ -50,7 +50,7 @@ final class NinasController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_ninas_edit', methods: ['GET', 'POST'])]
+    #[Route('/{slug}/edit', name: 'app_ninas_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Ninas $nina, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(NinasType::class, $nina);

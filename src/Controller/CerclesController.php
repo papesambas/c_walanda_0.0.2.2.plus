@@ -3,14 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Cercles;
+use App\Entity\Statuts;
 use App\Form\CerclesType;
-use App\Repository\CerclesRepository;
+use App\Data\SearchElevesData;
+use App\Form\SearchElevesDataType;
 use App\Repository\ElevesRepository;
+use App\Repository\CerclesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/cercles')]
 final class CerclesController extends AbstractController
@@ -44,15 +47,72 @@ final class CerclesController extends AbstractController
     }
 
     #[Route('/{slug}', name: 'app_cercles_show', methods: ['GET'])]
-    public function show(ElevesRepository $elevesRepository, Cercles $cercle): Response
+    public function show(Request $request ,ElevesRepository $elevesRepository, Cercles $cercle): Response
     {
-        $eleves = $elevesRepository->findByCercle($cercle);
+        // Création de l'objet de recherche
+        $searchData = new SearchElevesData();
+        $form = $this->createForm(SearchElevesDataType::class, $searchData);
+        $form->handleRequest($request);
+    
+        // Requête de base filtrée par lieu de naissance
+        $queryBuilder = $elevesRepository->createQueryBuilder('e')
+            ->leftjoin('e.lieuNaissance', 'ln')  // Jointure avec LieuNaissance
+            ->leftjoin('ln.commune', 'co')        // Jointure avec Commune
+            ->andWhere('co.cercle = :cercle')   // Filtrer sur le nom de la commune
+            ->setParameter('cercle', $cercle)
+            ->orderBy('e.fullname', 'ASC');
+    
+        // Application des filtres supplémentaires si formulaire soumis
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!empty($searchData->q)) {
+                $queryBuilder->andWhere('e.fullname LIKE :q')
+                    ->setParameter('q', '%' . $searchData->q . '%');
+            }
+    
+            if ($searchData->age1 !== null) {
+                $queryBuilder->andWhere('e.age >= :age1')
+                    ->setParameter('age1', $searchData->age1);
+            }
+    
+            if ($searchData->age2 !== null) {
+                $queryBuilder->andWhere('e.age <= :age2')
+                    ->setParameter('age2', $searchData->age2);
+            }
+    
+            if (!$searchData->statut->isEmpty()) {
+                $designations = $searchData->statut->map(function ($statut) {
+                    return $statut->getDesignation();
+                })->toArray();
+    
+                $queryBuilder
+                    ->leftJoin('e.statut', 's')
+                    ->andWhere('s.designation IN (:statuts)')
+                    ->setParameter('statuts', $designations);
+            }
+    
+            if (!$searchData->classe->isEmpty()) {
+                $queryBuilder->andWhere('e.classe IN (:classes)')
+                    ->setParameter('classes', $searchData->classe);
+            }
+        }
+    
+        // Exécution de la requête
+        $eleves = $queryBuilder
+            ->orderBy('e.fullname', 'ASC')
+            ->getQuery()
+            ->getResult();
+    
         return $this->render('eleves/index.html.twig', [
             'eleves' => $eleves,
+            'cercle' => $cercle,
+            'form' => $form->createView()
         ]);
+
     }
 
-    #[Route('/{id}/edit', name: 'app_cercles_edit', methods: ['GET', 'POST'])]
+
+
+    #[Route('/{slug}/edit', name: 'app_cercles_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Cercles $cercle, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CerclesType::class, $cercle);

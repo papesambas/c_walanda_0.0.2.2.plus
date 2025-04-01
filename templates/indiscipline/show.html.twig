@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Indiscipline{% endblock %}
+
+{% block body %}
+    <h1>Indiscipline</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ indiscipline.id }}</td>
+            </tr>
+            <tr>
+                <th>Jour</th>
+                <td>{{ indiscipline.jour ? indiscipline.jour|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ indiscipline.description }}</td>
+            </tr>
+            <tr>
+                <th>IsSanction</th>
+                <td>{{ indiscipline.isSanction ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Sanction</th>
+                <td>{{ indiscipline.sanction }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ indiscipline.createdAt ? indiscipline.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ indiscipline.updatedAt ? indiscipline.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ indiscipline.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_indiscipline_index') }}">back to list</a>
+
+    <a href="{{ path('app_indiscipline_edit', {'id': indiscipline.id}) }}">edit</a>
+
+    {{ include('indiscipline/_delete_form.html.twig') }}
+{% endblock %}
