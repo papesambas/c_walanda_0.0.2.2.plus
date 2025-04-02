@@ -116,6 +116,10 @@ class Personnels
     #[ORM\Column]
     private ?bool $isAllowed = false;
 
+    #[ORM\ManyToOne(inversedBy: 'personnels')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Fonctions $fonctions = null;
+
     public function __construct()
     {
         $this->dossier = new ArrayCollection();
@@ -492,6 +496,18 @@ class Personnels
     public function setIsAllowed(bool $isAllowed): static
     {
         $this->isAllowed = $isAllowed;
+
+        return $this;
+    }
+
+    public function getFonctions(): ?Fonctions
+    {
+        return $this->fonctions;
+    }
+
+    public function setFonctions(?Fonctions $fonctions): static
+    {
+        $this->fonctions = $fonctions;
 
         return $this;
     }
