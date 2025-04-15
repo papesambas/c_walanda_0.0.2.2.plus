@@ -33,7 +33,7 @@ class elevesEntityListener
     {
         $this->generateMatricule($eleves);
         $this->setCreatedFields($eleves);
-        //$this->createDefaultUsers($eleves);
+        $this->createDefaultUsers($eleves);
     }
 
     public function preUpdate(Eleves $eleves, LifecycleEventArgs $arg): void
@@ -144,12 +144,13 @@ class elevesEntityListener
         $user->setUsername($username);
         $user->setEmail($email);
         $user->setRoles($role);
-        //$user->setEleve($eleves);
+        $user->setEleve($eleves);
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
 
-        //$this->entityManager->persist($user);
+        $this->entityManager->persist($user);
+        
     }
 
     private function generateUniqueUsername(): string

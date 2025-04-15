@@ -13,8 +13,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/classes')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
+
 final class ClassesController extends AbstractController
 {
     #[Route(name: 'app_classes_index', methods: ['GET'])]

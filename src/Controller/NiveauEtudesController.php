@@ -10,8 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/niveau/etudes')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class NiveauEtudesController extends AbstractController
 {
     #[Route(name: 'app_niveau_etudes_index', methods: ['GET'])]

@@ -19,7 +19,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+
 #[Route('/parents')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class ParentsController extends AbstractController
 {
     #[IsGranted('ROLE_USER')]

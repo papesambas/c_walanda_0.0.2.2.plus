@@ -189,6 +189,9 @@ class Eleves
     #[ORM\OneToMany(targetEntity: Indiscipline::class, mappedBy: 'eleve', orphanRemoval: true)]
     private Collection $indisciplines;
 
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?Etablissements $etablissement = null;
+
     public function __construct()
     {
         $this->dossierEleves = new ArrayCollection();
@@ -806,6 +809,18 @@ class Eleves
                 $indiscipline->setEleve(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEtablissement(): ?Etablissements
+    {
+        return $this->etablissement;
+    }
+
+    public function setEtablissement(?Etablissements $etablissement): static
+    {
+        $this->etablissement = $etablissement;
 
         return $this;
     }

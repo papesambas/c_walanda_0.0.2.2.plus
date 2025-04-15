@@ -33,9 +33,10 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;    
 
 #[Route('/eleves')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class ElevesController extends AbstractController
 {
     public function __construct(private Security $security, private LoggerInterface $logger)

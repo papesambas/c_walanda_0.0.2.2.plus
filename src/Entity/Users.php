@@ -86,7 +86,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     
     private ?Etablissements $etablissement = null;
 
-    #[ORM\OneToOne(inversedBy: 'users', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'users', cascade: ['remove'])]
     
     private ?Eleves $eleve = null;
 

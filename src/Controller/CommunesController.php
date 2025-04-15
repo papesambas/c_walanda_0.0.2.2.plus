@@ -13,8 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;    
 
 #[Route('/communes')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class CommunesController extends AbstractController
 {
     #[Route(name: 'app_communes_index', methods: ['GET'])]

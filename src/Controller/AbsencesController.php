@@ -15,8 +15,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
-#[IsGranted('ROLE_SURVEILLANT')]
+
 #[Route('/absences')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class AbsencesController extends AbstractController
 {
     #[Route(name: 'app_absences_index', methods: ['GET'])]

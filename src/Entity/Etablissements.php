@@ -117,10 +117,17 @@ class Etablissements
     #[ORM\Column(length: 130, nullable: true)]
     private ?string $email = null;
 
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'etablissement')]
+    private Collection $eleves;
+
     public function __construct()
     {
         $this->cycles = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->eleves = new ArrayCollection();
     }
 
     public function __toString()
@@ -369,6 +376,36 @@ class Etablissements
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setEtablissement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getEtablissement() === $this) {
+                $elefe->setEtablissement(null);
+            }
+        }
 
         return $this;
     }

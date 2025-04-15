@@ -13,8 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/annee/scolaires')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
+
 final class AnneeScolairesController extends AbstractController
 {
     public function __construct(
@@ -84,7 +87,6 @@ final class AnneeScolairesController extends AbstractController
             'form' => $form->createView(),
         ]);
 
-        $this->addFlash('success', 'Année scolaire créée avec succès');
     }
 
     #[Route('/{id}/set-current', name: 'app_annee_scolaires_set_current', methods: ['POST'])]
